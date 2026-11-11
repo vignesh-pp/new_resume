@@ -114,14 +114,14 @@ export function App() {
           />
 
           {/* Split Pane: Left Editor | Right Live Preview */}
-          <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-            {/* Editor Pane (Left) */}
-            <div className="w-full lg:w-[48%] xl:w-[45%] h-full overflow-y-auto border-r border-slate-200 bg-slate-50/60 pb-12">
+          <div className="flex-1 flex flex-col lg:flex-row h-[calc(100vh-106px)] overflow-hidden">
+            {/* Editor Pane (Left) - Sticky and Smoothly Scrollable */}
+            <div className="w-full lg:w-[46%] xl:w-[44%] h-full overflow-y-auto border-r border-slate-200 bg-slate-50/60 custom-scrollbar pb-16">
               <ResumeEditor />
             </div>
 
-            {/* Live Preview Pane (Right) */}
-            <div className="w-full lg:w-[52%] xl:w-[55%] h-full p-4 lg:p-6 bg-slate-200/60 overflow-hidden flex flex-col">
+            {/* Live Preview Pane (Right) - Smoothly Scrollable Document View */}
+            <div className="w-full lg:w-[54%] xl:w-[56%] h-full overflow-hidden flex flex-col bg-slate-200/90">
               <ResumePreview
                 onPrint={handlePrint}
                 onDownloadPdf={handleDownloadPdf}

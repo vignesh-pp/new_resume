@@ -21,9 +21,14 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
   }[theme.spacing] || 'space-y-4';
 
   const defaultOrder = ['summary', 'experience', 'skills', 'projects', 'education', 'certifications'];
-  const sectionOrder = (resumeData.sectionOrder && resumeData.sectionOrder.length > 0)
+  const baseOrder = (resumeData.sectionOrder && resumeData.sectionOrder.length > 0)
     ? resumeData.sectionOrder
     : defaultOrder;
+  const customIds = (resumeData.customSections || []).map((s) => s.id);
+  const sectionOrder = [
+    ...baseOrder,
+    ...customIds.filter((id) => !baseOrder.includes(id)),
+  ];
 
   const leftSections = theme.leftSections || ['skills', 'education', 'certifications'];
   const rightSections = theme.rightSections || ['summary', 'experience', 'projects'];
@@ -214,6 +219,30 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     );
   };
 
+  // 7. Render Custom Section
+  const renderCustomSection = (sec: { id: string; title: string; items: any[] }) => {
+    if (visibleSections[sec.id] === false || !sec.items || sec.items.length === 0) return null;
+    return (
+      <section key={sec.id}>
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5`} style={{ color: theme.primaryColor }}>
+          {sec.title}
+        </h2>
+        <div className="space-y-2">
+          {sec.items.map((it: any, idx: number) => (
+            <div key={idx}>
+              <div className="flex justify-between items-baseline">
+                <span className="font-bold text-gray-900">{it.title}</span>
+                {it.date && <span className="text-xs text-gray-600 font-medium">{it.date}</span>}
+              </div>
+              {it.subtitle && <p className="text-xs text-gray-700 italic">{it.subtitle}</p>}
+              {it.description && <p className="text-xs text-gray-800 mt-0.5 leading-relaxed">{it.description}</p>}
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
   const renderSectionByKey = (key: string) => {
     switch (key) {
       case 'summary':
@@ -228,8 +257,11 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
         return renderEducation();
       case 'certifications':
         return renderCertifications();
-      default:
+      default: {
+        const customSec = (resumeData.customSections || []).find((s) => s.id === key);
+        if (customSec) return renderCustomSection(customSec);
         return null;
+      }
     }
   };
 
@@ -239,40 +271,49 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
       className={`w-full max-w-[800px] mx-auto bg-white text-gray-900 p-8 shadow-sm ${sizeClasses.body} ${spacingClass} print:p-0 print:shadow-none`}
     >
       {/* Header */}
-      <header className="text-center border-b pb-3 border-gray-400">
-        <h1 
-          className={`${sizeClasses.h1} font-bold tracking-tight uppercase`}
-          style={{ color: theme.primaryColor }}
-        >
-          {personalInfo.fullName}
-        </h1>
-        {personalInfo.jobTitle && (
-          <p className="text-sm font-medium text-gray-700 mt-0.5">{personalInfo.jobTitle}</p>
-        )}
-        <div className="flex flex-wrap justify-center items-center gap-x-2 text-xs text-gray-600 mt-1.5">
-          {personalInfo.location && <span>{personalInfo.location}</span>}
-          {personalInfo.phone && <span>• {personalInfo.phone}</span>}
-          {personalInfo.email && (
-            <span>
-              • <a href={`mailto:${personalInfo.email}`} className="text-gray-900 underline">{personalInfo.email}</a>
-            </span>
+      <header className="flex items-center justify-between border-b pb-3 border-gray-400 gap-4">
+        <div className="flex-1 text-center">
+          <h1 
+            className={`${sizeClasses.h1} font-bold tracking-tight uppercase`}
+            style={{ color: theme.primaryColor }}
+          >
+            {personalInfo.fullName}
+          </h1>
+          {personalInfo.jobTitle && (
+            <p className="text-sm font-medium text-gray-700 mt-0.5">{personalInfo.jobTitle}</p>
           )}
-          {personalInfo.linkedin && (
-            <span>
-              • <a href={personalInfo.linkedin} target="_blank" rel="noreferrer" className="text-gray-900 underline">LinkedIn</a>
-            </span>
-          )}
-          {personalInfo.github && (
-            <span>
-              • <a href={personalInfo.github} target="_blank" rel="noreferrer" className="text-gray-900 underline">GitHub</a>
-            </span>
-          )}
-          {personalInfo.website && (
-            <span>
-              • <a href={personalInfo.website} target="_blank" rel="noreferrer" className="text-gray-900 underline">Portfolio</a>
-            </span>
-          )}
+          <div className="flex flex-wrap justify-center items-center gap-x-2 text-xs text-gray-600 mt-1.5">
+            {personalInfo.location && <span>{personalInfo.location}</span>}
+            {personalInfo.phone && <span>• {personalInfo.phone}</span>}
+            {personalInfo.email && (
+              <span>
+                • <a href={`mailto:${personalInfo.email}`} className="text-gray-900 underline">{personalInfo.email}</a>
+              </span>
+            )}
+            {personalInfo.linkedin && (
+              <span>
+                • <a href={personalInfo.linkedin} target="_blank" rel="noreferrer" className="text-gray-900 underline">LinkedIn</a>
+              </span>
+            )}
+            {personalInfo.github && (
+              <span>
+                • <a href={personalInfo.github} target="_blank" rel="noreferrer" className="text-gray-900 underline">GitHub</a>
+              </span>
+            )}
+            {personalInfo.website && (
+              <span>
+                • <a href={personalInfo.website} target="_blank" rel="noreferrer" className="text-gray-900 underline">Portfolio</a>
+              </span>
+            )}
+          </div>
         </div>
+        {theme.showPhoto && personalInfo.photoUrl && (
+          <img
+            src={personalInfo.photoUrl}
+            alt={personalInfo.fullName}
+            className="w-16 h-16 rounded-xl object-cover border border-gray-300 shadow-xs shrink-0"
+          />
+        )}
       </header>
 
       {/* Main Body - Row vs Column Layout */}

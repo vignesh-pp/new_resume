@@ -20,31 +20,40 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
       className={`w-full max-w-[800px] mx-auto bg-white text-slate-900 p-8 shadow-sm ${sizeClasses.body} print:p-0 print:shadow-none`}
     >
       {/* Executive Double Border Header */}
-      <header className="text-center pb-4 border-b-2 border-slate-900">
-        <h1 
-          className={`${sizeClasses.h1} font-normal tracking-wide uppercase`}
-          style={{ color: theme.primaryColor }}
-        >
-          {personalInfo.fullName}
-        </h1>
-        {personalInfo.jobTitle && (
-          <p className="text-sm tracking-widest text-slate-600 uppercase mt-1">
-            {personalInfo.jobTitle}
-          </p>
+      <header className="flex flex-col sm:flex-row items-center justify-between pb-4 border-b-2 border-slate-900 gap-4">
+        {theme.showPhoto && personalInfo.photoUrl && (
+          <img
+            src={personalInfo.photoUrl}
+            alt={personalInfo.fullName}
+            className="w-18 h-18 rounded-full object-cover border-2 border-slate-800 shadow-sm shrink-0"
+          />
         )}
-        <div className="flex flex-wrap justify-center items-center gap-x-3 text-xs text-slate-600 mt-2">
-          {personalInfo.location && <span>{personalInfo.location}</span>}
-          {personalInfo.phone && <span>| {personalInfo.phone}</span>}
-          {personalInfo.email && (
-            <span>
-              | <a href={`mailto:${personalInfo.email}`} className="text-slate-900 underline">{personalInfo.email}</a>
-            </span>
+        <div className="flex-1 text-center sm:text-left">
+          <h1 
+            className={`${sizeClasses.h1} font-normal tracking-wide uppercase`}
+            style={{ color: theme.primaryColor }}
+          >
+            {personalInfo.fullName}
+          </h1>
+          {personalInfo.jobTitle && (
+            <p className="text-sm tracking-widest text-slate-600 uppercase mt-1">
+              {personalInfo.jobTitle}
+            </p>
           )}
-          {personalInfo.linkedin && (
-            <span>
-              | <a href={personalInfo.linkedin} target="_blank" rel="noreferrer" className="text-slate-900 underline">LinkedIn</a>
-            </span>
-          )}
+          <div className="flex flex-wrap justify-center sm:justify-start items-center gap-x-3 text-xs text-slate-600 mt-2">
+            {personalInfo.location && <span>{personalInfo.location}</span>}
+            {personalInfo.phone && <span>| {personalInfo.phone}</span>}
+            {personalInfo.email && (
+              <span>
+                | <a href={`mailto:${personalInfo.email}`} className="text-slate-900 underline">{personalInfo.email}</a>
+              </span>
+            )}
+            {personalInfo.linkedin && (
+              <span>
+                | <a href={personalInfo.linkedin} target="_blank" rel="noreferrer" className="text-slate-900 underline">LinkedIn</a>
+              </span>
+            )}
+          </div>
         </div>
       </header>
 
@@ -147,6 +156,30 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
           </div>
         </section>
       )}
+
+      {/* Custom Sections (Executive Honors / Board / Speaking) */}
+      {(resumeData.customSections || []).map((sec) => {
+        if (visibleSections[sec.id] === false || !sec.items?.length) return null;
+        return (
+          <section key={sec.id} className="mt-4">
+            <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b border-slate-400 pb-1 mb-2`}>
+              {sec.title}
+            </h2>
+            <div className="space-y-2 text-xs">
+              {sec.items.map((it, idx) => (
+                <div key={idx} className="pb-1.5">
+                  <div className="flex justify-between items-baseline">
+                    <span className="font-bold text-slate-900">{it.title}</span>
+                    {it.date && <span className="text-slate-500 font-medium">{it.date}</span>}
+                  </div>
+                  {it.subtitle && <p className="text-slate-700 italic">{it.subtitle}</p>}
+                  {it.description && <p className="text-slate-800 mt-0.5 leading-relaxed">{it.description}</p>}
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 };

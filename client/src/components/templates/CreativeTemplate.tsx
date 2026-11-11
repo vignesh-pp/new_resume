@@ -22,14 +22,22 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
     >
       {/* Left Sidebar (35%) */}
       <aside className="w-full sm:w-[35%] bg-slate-900 text-slate-100 p-6 flex flex-col gap-6">
-        {/* Profile Circle / Initials */}
+        {/* Profile Circle / Initials / Photo */}
         <div className="flex flex-col items-center sm:items-start">
-          <div 
-            className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white shadow-md mb-3"
-            style={{ backgroundColor: theme.primaryColor }}
-          >
-            {personalInfo.fullName ? personalInfo.fullName.charAt(0) : 'R'}
-          </div>
+          {theme.showPhoto !== false && personalInfo.photoUrl ? (
+            <img
+              src={personalInfo.photoUrl}
+              alt={personalInfo.fullName}
+              className="w-16 h-16 rounded-2xl object-cover shadow-md mb-3 border-2 border-slate-700 ring-2 ring-white/10"
+            />
+          ) : (
+            <div 
+              className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white shadow-md mb-3"
+              style={{ backgroundColor: theme.primaryColor }}
+            >
+              {personalInfo.fullName ? personalInfo.fullName.charAt(0) : 'R'}
+            </div>
+          )}
           <h2 className="text-lg font-bold text-white tracking-tight">{personalInfo.fullName}</h2>
           <p className="text-xs text-slate-400 font-medium">{personalInfo.jobTitle}</p>
         </div>
@@ -211,6 +219,30 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
             </div>
           </section>
         )}
+
+        {/* Custom Sections */}
+        {(resumeData.customSections || []).map((sec) => {
+          if (visibleSections[sec.id] === false || !sec.items?.length) return null;
+          return (
+            <section key={sec.id}>
+              <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-1 mb-3`} style={{ borderColor: theme.primaryColor }}>
+                {sec.title}
+              </h2>
+              <div className="space-y-3">
+                {sec.items.map((it, idx) => (
+                  <div key={idx} className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                    <div className="flex justify-between items-baseline">
+                      <h3 className="text-xs font-bold text-slate-900">{it.title}</h3>
+                      {it.date && <span className="text-[11px] font-medium text-slate-500">{it.date}</span>}
+                    </div>
+                    {it.subtitle && <p className="text-xs font-semibold" style={{ color: theme.primaryColor }}>{it.subtitle}</p>}
+                    {it.description && <p className="text-slate-600 mt-1 text-xs leading-relaxed">{it.description}</p>}
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        })}
       </main>
     </div>
   );

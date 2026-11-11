@@ -32,9 +32,14 @@ export const LayoutManagerModal: React.FC<LayoutManagerModalProps> = ({ isOpen, 
 
   if (!isOpen) return null;
 
-  const currentOrder = resumeData.sectionOrder && resumeData.sectionOrder.length > 0
+  const baseOrder = resumeData.sectionOrder && resumeData.sectionOrder.length > 0
     ? resumeData.sectionOrder
     : ['summary', 'experience', 'skills', 'projects', 'education', 'certifications'];
+  const customIds = (resumeData.customSections || []).map((s) => s.id);
+  const currentOrder = [
+    ...baseOrder,
+    ...customIds.filter((id) => !baseOrder.includes(id)),
+  ];
 
   const visibleSections = resumeData.visibleSections || {};
   const currentLayout = theme.layoutMode || 'single-column';
@@ -141,7 +146,8 @@ export const LayoutManagerModal: React.FC<LayoutManagerModalProps> = ({ isOpen, 
 
             <div className="space-y-2">
               {currentOrder.map((sectionKey, idx) => {
-                const label = SECTION_LABELS[sectionKey] || sectionKey;
+                const customSec = (resumeData.customSections || []).find((s) => s.id === sectionKey);
+                const label = SECTION_LABELS[sectionKey] || customSec?.title || sectionKey;
                 const isVisible = visibleSections[sectionKey] !== false;
                 const inLeftCol = leftSections.includes(sectionKey);
 
@@ -289,3 +295,4 @@ export const LayoutManagerModal: React.FC<LayoutManagerModalProps> = ({ isOpen, 
     </div>
   );
 };
+

@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useResumeStore } from '../../store/useResumeStore';
 import { 
   User, Briefcase, GraduationCap, Wrench, FolderGit2, Award, 
   ChevronDown, ChevronUp, Plus, Trash2, Sparkles, Eye, EyeOff, 
-  ArrowUp, ArrowDown, Wand2, Tag 
+  ArrowUp, ArrowDown, Wand2, Tag, Camera, Layers, Upload, Check 
 } from 'lucide-react';
 import axios from 'axios';
 
 export const ResumeEditor: React.FC = () => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const {
     resumeData,
+    theme,
+    setTheme,
     updatePersonalInfo,
     updateSummary,
     addExperience,
@@ -25,6 +29,12 @@ export const ResumeEditor: React.FC = () => {
     addCertification,
     updateCertification,
     removeCertification,
+    addCustomSection,
+    updateCustomSection,
+    removeCustomSection,
+    addCustomSectionItem,
+    updateCustomSectionItem,
+    removeCustomSectionItem,
     toggleSectionVisibility,
     setShowBulletModal,
     setActiveBulletContext,
@@ -37,7 +47,50 @@ export const ResumeEditor: React.FC = () => {
     setExpandedSection(expandedSection === section ? '' : section);
   };
 
-  const { personalInfo, summary, experience, education, skills, projects, certifications, visibleSections } = resumeData;
+  const { personalInfo, summary, experience, education, skills, projects, certifications, customSections = [], visibleSections } = resumeData;
+
+  const navItems = [
+    { id: 'personal', label: 'Personal', icon: User },
+    { id: 'summary', label: 'Summary', icon: Sparkles },
+    { id: 'experience', label: 'Experience', count: experience.length, icon: Briefcase },
+    { id: 'skills', label: 'Skills', icon: Wrench },
+    { id: 'projects', label: 'Projects', count: projects.length, icon: FolderGit2 },
+    { id: 'education', label: 'Education', count: education.length, icon: GraduationCap },
+    { id: 'certifications', label: 'Certs', count: certifications.length, icon: Award },
+    { id: 'custom', label: 'Custom', count: customSections.length, icon: Layers },
+  ];
+
+  const scrollToSection = (id: string) => {
+    setExpandedSection(id);
+    setTimeout(() => {
+      const el = document.getElementById(`editor-section-${id}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 50);
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Photo is larger than 5MB. Please choose a smaller image.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      updatePersonalInfo({ photoUrl: result });
+      if (!theme.showPhoto) {
+        setTheme({ showPhoto: true });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemovePhoto = () => {
+    updatePersonalInfo({ photoUrl: '' });
+  };
 
   const handleAiBulletClick = (expId: string, bulletIndex: number, text: string) => {
     setActiveBulletContext({ expId, bulletIndex, text });
@@ -92,8 +145,40 @@ export const ResumeEditor: React.FC = () => {
 
   return (
     <div className="p-4 sm:p-6 space-y-4 max-w-3xl mx-auto">
+      {/* Sticky Quick-Jump Navigation Bar */}
+      <div className="sticky top-0 z-20 -mt-2 mb-3 bg-white/95 backdrop-blur-md px-2 py-2 rounded-2xl border border-slate-200/90 shadow-xs flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = expandedSection === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => scrollToSection(item.id)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${
+                isActive
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              <span>{item.label}</span>
+              {item.count !== undefined && (
+                <span
+                  className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                    isActive ? 'bg-white/25 text-white' : 'bg-slate-200 text-slate-700'
+                  }`}
+                >
+                  {item.count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
       {/* 1. Personal Information */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+      <div id="editor-section-personal" className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
         <button
           onClick={() => toggleSection('personal')}
           className="w-full flex items-center justify-between p-4 sm:px-6 hover:bg-slate-50 transition-colors"
@@ -112,6 +197,85 @@ export const ResumeEditor: React.FC = () => {
 
         {expandedSection === 'personal' && (
           <div className="p-4 sm:px-6 pt-0 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Profile Photo Uploader & URL */}
+            <div className="sm:col-span-2 p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 flex flex-col sm:flex-row items-center gap-4">
+              <div className="relative group shrink-0">
+                {personalInfo.photoUrl ? (
+                  <img
+                    src={personalInfo.photoUrl}
+                    alt={personalInfo.fullName}
+                    className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-sm ring-2 ring-blue-500/20"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-2xl bg-blue-100 text-blue-600 flex flex-col items-center justify-center border-2 border-dashed border-blue-300">
+                    <User className="w-6 h-6" />
+                    <span className="text-[9px] font-semibold mt-0.5">No Photo</span>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute -bottom-1 -right-1 p-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition-transform active:scale-95"
+                  title="Upload avatar"
+                >
+                  <Camera className="w-3 h-3" />
+                </button>
+              </div>
+
+              <div className="flex-1 w-full space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-xs font-bold text-slate-800">Profile Photo (Optional)</span>
+                  <label className="flex items-center gap-1.5 text-xs font-medium text-slate-600 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={theme.showPhoto ?? true}
+                      onChange={(e) => setTheme({ showPhoto: e.target.checked })}
+                      className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span>Show on resume</span>
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handlePhotoUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-2.5 py-1.5 bg-white border border-slate-200 hover:border-slate-300 rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-xs transition-colors shrink-0"
+                  >
+                    <Upload className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Upload Image</span>
+                  </button>
+                  <input
+                    type="text"
+                    value={personalInfo.photoUrl || ''}
+                    onChange={(e) => {
+                      updatePersonalInfo({ photoUrl: e.target.value });
+                      if (e.target.value && !theme.showPhoto) setTheme({ showPhoto: true });
+                    }}
+                    placeholder="Or paste image URL (https://...)"
+                    className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                  {personalInfo.photoUrl && (
+                    <button
+                      type="button"
+                      onClick={handleRemovePhoto}
+                      className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors shrink-0"
+                      title="Remove Photo"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
               <input
@@ -197,7 +361,7 @@ export const ResumeEditor: React.FC = () => {
       </div>
 
       {/* 2. Professional Summary */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div id="editor-section-summary" className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <button
           onClick={() => toggleSection('summary')}
           className="w-full flex items-center justify-between p-4 sm:px-6 hover:bg-slate-50 transition-colors"
@@ -255,7 +419,7 @@ export const ResumeEditor: React.FC = () => {
       </div>
 
       {/* 3. Work Experience */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div id="editor-section-experience" className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <button
           onClick={() => toggleSection('experience')}
           className="w-full flex items-center justify-between p-4 sm:px-6 hover:bg-slate-50 transition-colors"
@@ -421,7 +585,7 @@ export const ResumeEditor: React.FC = () => {
       </div>
 
       {/* 4. Skills & Competencies with Skill Bank Pill Suggestions */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div id="editor-section-skills" className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <button
           onClick={() => toggleSection('skills')}
           className="w-full flex items-center justify-between p-4 sm:px-6 hover:bg-slate-50 transition-colors"
@@ -542,7 +706,7 @@ export const ResumeEditor: React.FC = () => {
       </div>
 
       {/* 5. Projects */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div id="editor-section-projects" className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <button
           onClick={() => toggleSection('projects')}
           className="w-full flex items-center justify-between p-4 sm:px-6 hover:bg-slate-50 transition-colors"
@@ -644,7 +808,7 @@ export const ResumeEditor: React.FC = () => {
       </div>
 
       {/* 6. Education */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div id="editor-section-education" className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <button
           onClick={() => toggleSection('education')}
           className="w-full flex items-center justify-between p-4 sm:px-6 hover:bg-slate-50 transition-colors"
@@ -726,7 +890,7 @@ export const ResumeEditor: React.FC = () => {
       </div>
 
       {/* 7. Certifications */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div id="editor-section-certifications" className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <button
           onClick={() => toggleSection('certifications')}
           className="w-full flex items-center justify-between p-4 sm:px-6 hover:bg-slate-50 transition-colors"
@@ -781,6 +945,154 @@ export const ResumeEditor: React.FC = () => {
               className="w-full py-2 rounded-xl border-2 border-dashed border-cyan-200 text-cyan-600 font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-cyan-50/50"
             >
               <Plus className="w-4 h-4" /> Add Certification
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 8. Custom Sections */}
+      <div id="editor-section-custom" className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <button
+          onClick={() => toggleSection('custom')}
+          className="w-full flex items-center justify-between p-4 sm:px-6 hover:bg-slate-50 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <Layers className="w-4 h-4" />
+            </div>
+            <div className="text-left">
+              <h3 className="text-sm font-bold text-slate-900">
+                Custom Sections ({customSections.length})
+              </h3>
+              <p className="text-xs text-slate-500">
+                Awards, publications, languages, volunteer work & more
+              </p>
+            </div>
+          </div>
+          {expandedSection === 'custom' ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+        </button>
+
+        {expandedSection === 'custom' && (
+          <div className="p-4 sm:px-6 pt-0 border-t border-slate-100 space-y-4">
+            {/* Quick preset add pills */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-3">
+              <span className="text-[11px] font-semibold text-slate-500 mr-1">Quick Add:</span>
+              {[
+                { label: '🏆 Awards & Honors', title: 'Awards & Honors' },
+                { label: '📚 Publications', title: 'Publications & Research' },
+                { label: '🤝 Volunteer Work', title: 'Volunteer Experience' },
+                { label: '🌐 Spoken Languages', title: 'Languages' },
+              ].map((preset) => (
+                <button
+                  key={preset.title}
+                  type="button"
+                  onClick={() => addCustomSection(preset.title)}
+                  className="px-2.5 py-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-xs font-medium rounded-lg transition-colors flex items-center gap-1"
+                >
+                  <Plus className="w-3 h-3" /> {preset.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Custom section items list */}
+            {customSections.map((sec) => (
+              <div key={sec.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
+                <div className="flex items-center justify-between gap-2 border-b border-slate-200 pb-2">
+                  <div className="flex-1 flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-indigo-600 shrink-0" />
+                    <input
+                      type="text"
+                      value={sec.title}
+                      onChange={(e) => updateCustomSection(sec.id, { title: e.target.value })}
+                      placeholder="Section Title (e.g. Awards & Honors)"
+                      className="font-bold text-xs text-slate-900 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:outline-none px-1 py-0.5"
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => toggleSectionVisibility(sec.id)}
+                      className="p-1 text-slate-400 hover:text-slate-600 rounded"
+                      title="Toggle Visibility"
+                    >
+                      {visibleSections[sec.id] !== false ? (
+                        <Eye className="w-4 h-4 text-indigo-600" />
+                      ) : (
+                        <EyeOff className="w-4 h-4" />
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeCustomSection(sec.id)}
+                      className="p-1 text-rose-500 hover:bg-rose-50 rounded"
+                      title="Delete Section"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Items in this custom section */}
+                <div className="space-y-2.5">
+                  {sec.items.map((item, itemIdx) => (
+                    <div key={itemIdx} className="p-2.5 bg-white rounded-lg border border-slate-200 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={item.title}
+                          onChange={(e) => updateCustomSectionItem(sec.id, itemIdx, { title: e.target.value })}
+                          placeholder="Title / Award / Role (e.g. Innovator of the Year)"
+                          className="flex-1 px-2 py-1 text-xs font-semibold rounded border border-slate-200 focus:outline-none focus:border-indigo-500"
+                        />
+                        <input
+                          type="text"
+                          value={item.date || ''}
+                          onChange={(e) => updateCustomSectionItem(sec.id, itemIdx, { date: e.target.value })}
+                          placeholder="Year (e.g. 2023)"
+                          className="w-24 px-2 py-1 text-xs rounded border border-slate-200 focus:outline-none focus:border-indigo-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeCustomSectionItem(sec.id, itemIdx)}
+                          className="text-rose-500 hover:text-rose-700 p-1"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={item.subtitle || ''}
+                        onChange={(e) => updateCustomSectionItem(sec.id, itemIdx, { subtitle: e.target.value })}
+                        placeholder="Subtitle / Organization (e.g. IEEE / Company Name)"
+                        className="w-full px-2 py-1 text-xs rounded border border-slate-200 focus:outline-none focus:border-indigo-500"
+                      />
+                      <textarea
+                        rows={2}
+                        value={item.description || ''}
+                        onChange={(e) => updateCustomSectionItem(sec.id, itemIdx, { description: e.target.value })}
+                        placeholder="Brief description, scope, or accomplishments..."
+                        className="w-full p-2 text-xs rounded border border-slate-200 focus:outline-none focus:border-indigo-500 leading-relaxed"
+                      />
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() => addCustomSectionItem(sec.id)}
+                    className="w-full py-1.5 rounded-lg border border-dashed border-indigo-200 text-indigo-600 font-semibold text-xs flex items-center justify-center gap-1 hover:bg-indigo-50/50"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Item
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            <button
+              type="button"
+              onClick={() => addCustomSection('New Section')}
+              className="w-full py-2.5 rounded-xl border-2 border-dashed border-indigo-300 text-indigo-600 font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-indigo-50/50"
+            >
+              <Plus className="w-4 h-4" /> Add Another Custom Section
             </button>
           </div>
         )}

@@ -16,9 +16,14 @@ export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
   const bulletIcon = getBulletIcon(theme.bulletStyle);
 
   const defaultOrder = ['summary', 'skills', 'experience', 'projects', 'education', 'certifications'];
-  const sectionOrder = (resumeData.sectionOrder && resumeData.sectionOrder.length > 0)
+  const baseOrder = (resumeData.sectionOrder && resumeData.sectionOrder.length > 0)
     ? resumeData.sectionOrder
     : defaultOrder;
+  const customIds = (resumeData.customSections || []).map((s) => s.id);
+  const sectionOrder = [
+    ...baseOrder,
+    ...customIds.filter((id) => !baseOrder.includes(id)),
+  ];
 
   const leftSections = theme.leftSections || ['skills', 'education', 'certifications'];
   const rightSections = theme.rightSections || ['summary', 'experience', 'projects'];
@@ -182,6 +187,30 @@ export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
     );
   };
 
+  // 7. Render Custom Section (Terminal style)
+  const renderCustomSection = (sec: { id: string; title: string; items: any[] }) => {
+    if (visibleSections[sec.id] === false || !sec.items || sec.items.length === 0) return null;
+    return (
+      <section key={sec.id} className="mb-4">
+        <h2 className="text-[11px] font-mono font-bold uppercase tracking-wider text-teal-700 border-b border-slate-300 pb-0.5 mb-2">
+          $ {sec.title.toLowerCase().replace(/\s+/g, '-')}
+        </h2>
+        <div className="space-y-2 text-xs">
+          {sec.items.map((it: any, idx: number) => (
+            <div key={idx} className="font-mono">
+              <div className="flex justify-between items-baseline">
+                <span className="font-bold text-slate-900">&gt; {it.title}</span>
+                {it.date && <span className="text-[11px] text-slate-500">[{it.date}]</span>}
+              </div>
+              {it.subtitle && <p className="text-slate-600 pl-3"># {it.subtitle}</p>}
+              {it.description && <p className="text-slate-700 pl-3 mt-0.5 leading-relaxed">{it.description}</p>}
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
   const renderSectionByKey = (key: string) => {
     switch (key) {
       case 'summary':
@@ -196,8 +225,11 @@ export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
         return renderEducation();
       case 'certifications':
         return renderCertifications();
-      default:
+      default: {
+        const customSec = (resumeData.customSections || []).find((s) => s.id === key);
+        if (customSec) return renderCustomSection(customSec);
         return null;
+      }
     }
   };
 
@@ -208,19 +240,28 @@ export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
     >
       {/* Terminal Style Header Bar */}
       <header className="border-b-2 pb-4 mb-4" style={{ borderColor: theme.primaryColor }}>
-        <div className="flex justify-between items-center">
-          <div>
-            <div className="flex items-center gap-2">
-              <Terminal className="w-5 h-5 text-teal-600" />
-              <h1 className={`${sizeClasses.h1} font-bold tracking-tight text-slate-950 font-mono`}>
-                {personalInfo.fullName}
-              </h1>
-            </div>
-            {personalInfo.jobTitle && (
-              <p className="text-xs font-semibold text-slate-600 font-mono mt-0.5">
-                // {personalInfo.jobTitle}
-              </p>
+        <div className="flex justify-between items-center gap-4">
+          <div className="flex items-center gap-3">
+            {theme.showPhoto && personalInfo.photoUrl && (
+              <img
+                src={personalInfo.photoUrl}
+                alt={personalInfo.fullName}
+                className="w-14 h-14 rounded-lg object-cover border-2 border-teal-600 shadow-xs shrink-0"
+              />
             )}
+            <div>
+              <div className="flex items-center gap-2">
+                <Terminal className="w-5 h-5 text-teal-600" />
+                <h1 className={`${sizeClasses.h1} font-bold tracking-tight text-slate-950 font-mono`}>
+                  {personalInfo.fullName}
+                </h1>
+              </div>
+              {personalInfo.jobTitle && (
+                <p className="text-xs font-semibold text-slate-600 font-mono mt-0.5">
+                  // {personalInfo.jobTitle}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex flex-col text-right text-xs font-mono text-slate-600 space-y-0.5">
             {personalInfo.email && (

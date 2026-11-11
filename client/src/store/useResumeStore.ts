@@ -1,5 +1,9 @@
 import { create } from 'zustand';
-import { ResumeSchema, TemplateId, ThemeSettings, AtsScoreBreakdown, ExperienceItem, EducationItem, ProjectItem, CertificationItem } from '../types/resume';
+import { 
+  ResumeSchema, TemplateId, ThemeSettings, AtsScoreBreakdown, 
+  ExperienceItem, EducationItem, ProjectItem, CertificationItem,
+  CustomSection, CustomSectionItem 
+} from '../types/resume';
 import { developerResume, executiveResume, designerResume } from '../utils/sampleResumes';
 
 interface ResumeStoreState {
@@ -31,6 +35,12 @@ interface ResumeStoreState {
   addCertification: () => void;
   updateCertification: (id: string, updated: Partial<CertificationItem>) => void;
   removeCertification: (id: string) => void;
+  addCustomSection: (title?: string) => void;
+  updateCustomSection: (id: string, updated: Partial<CustomSection>) => void;
+  removeCustomSection: (id: string) => void;
+  addCustomSectionItem: (sectionId: string) => void;
+  updateCustomSectionItem: (sectionId: string, index: number, updated: Partial<CustomSectionItem>) => void;
+  removeCustomSectionItem: (sectionId: string, index: number) => void;
   toggleSectionVisibility: (section: string) => void;
   reorderSections: (newOrder: string[]) => void;
   moveSectionOrder: (sectionKey: string, direction: 'up' | 'down') => void;
@@ -236,6 +246,95 @@ export const useResumeStore = create<ResumeStoreState>((set) => ({
       resumeData: {
         ...state.resumeData,
         certifications: state.resumeData.certifications.filter((c) => c.id !== id),
+      },
+    })),
+
+  addCustomSection: (title = 'Awards & Honors') =>
+    set((state) => {
+      const newSec: CustomSection = {
+        id: 'custom-' + Date.now(),
+        title,
+        items: [
+          {
+            title: 'Outstanding Technical Achievement Award',
+            subtitle: 'Company Annual Summit',
+            date: '2023',
+            description: 'Recognized for pioneering high-concurrency payment engine.',
+          },
+        ],
+      };
+      const existing = state.resumeData.customSections || [];
+      const order = state.resumeData.sectionOrder || [];
+      return {
+        resumeData: {
+          ...state.resumeData,
+          customSections: [...existing, newSec],
+          sectionOrder: [...order, newSec.id],
+          visibleSections: {
+            ...state.resumeData.visibleSections,
+            [newSec.id]: true,
+          },
+        },
+      };
+    }),
+
+  updateCustomSection: (id, updated) =>
+    set((state) => ({
+      resumeData: {
+        ...state.resumeData,
+        customSections: (state.resumeData.customSections || []).map((sec) =>
+          sec.id === id ? { ...sec, ...updated } : sec
+        ),
+      },
+    })),
+
+  removeCustomSection: (id) =>
+    set((state) => ({
+      resumeData: {
+        ...state.resumeData,
+        customSections: (state.resumeData.customSections || []).filter((s) => s.id !== id),
+        sectionOrder: (state.resumeData.sectionOrder || []).filter((s) => s !== id),
+      },
+    })),
+
+  addCustomSectionItem: (sectionId) =>
+    set((state) => ({
+      resumeData: {
+        ...state.resumeData,
+        customSections: (state.resumeData.customSections || []).map((sec) => {
+          if (sec.id !== sectionId) return sec;
+          const newItem: CustomSectionItem = {
+            title: 'New Achievement / Award',
+            subtitle: 'Issuing Organization',
+            date: '2024',
+            description: 'Details and scope of the recognition.',
+          };
+          return { ...sec, items: [...sec.items, newItem] };
+        }),
+      },
+    })),
+
+  updateCustomSectionItem: (sectionId, index, updated) =>
+    set((state) => ({
+      resumeData: {
+        ...state.resumeData,
+        customSections: (state.resumeData.customSections || []).map((sec) => {
+          if (sec.id !== sectionId) return sec;
+          const newItems = [...sec.items];
+          newItems[index] = { ...newItems[index], ...updated };
+          return { ...sec, items: newItems };
+        }),
+      },
+    })),
+
+  removeCustomSectionItem: (sectionId, index) =>
+    set((state) => ({
+      resumeData: {
+        ...state.resumeData,
+        customSections: (state.resumeData.customSections || []).map((sec) => {
+          if (sec.id !== sectionId) return sec;
+          return { ...sec, items: sec.items.filter((_, i) => i !== index) };
+        }),
       },
     })),
 

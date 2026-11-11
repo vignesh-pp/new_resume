@@ -20,22 +20,31 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
       className={`w-full max-w-[800px] mx-auto bg-white text-zinc-900 p-10 shadow-sm ${sizeClasses.body} print:p-0 print:shadow-none`}
     >
       {/* Clean Minimal Header */}
-      <header className="mb-8">
-        <h1 className={`${sizeClasses.h1} font-light tracking-tight text-zinc-950 uppercase`}>
-          {personalInfo.fullName}
-        </h1>
-        {personalInfo.jobTitle && (
-          <p className="text-sm tracking-widest text-zinc-500 uppercase mt-1">
-            {personalInfo.jobTitle}
-          </p>
-        )}
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500 mt-3 font-light">
-          {personalInfo.location && <span>{personalInfo.location}</span>}
-          {personalInfo.email && <a href={`mailto:${personalInfo.email}`} className="hover:text-zinc-900">{personalInfo.email}</a>}
-          {personalInfo.phone && <span>{personalInfo.phone}</span>}
-          {personalInfo.linkedin && <a href={personalInfo.linkedin} target="_blank" rel="noreferrer" className="hover:text-zinc-900">LinkedIn</a>}
-          {personalInfo.github && <a href={personalInfo.github} target="_blank" rel="noreferrer" className="hover:text-zinc-900">GitHub</a>}
+      <header className="mb-8 flex flex-col sm:flex-row justify-between items-start gap-4">
+        <div>
+          <h1 className={`${sizeClasses.h1} font-light tracking-tight text-zinc-950 uppercase`}>
+            {personalInfo.fullName}
+          </h1>
+          {personalInfo.jobTitle && (
+            <p className="text-sm tracking-widest text-zinc-500 uppercase mt-1">
+              {personalInfo.jobTitle}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500 mt-3 font-light">
+            {personalInfo.location && <span>{personalInfo.location}</span>}
+            {personalInfo.email && <a href={`mailto:${personalInfo.email}`} className="hover:text-zinc-900">{personalInfo.email}</a>}
+            {personalInfo.phone && <span>{personalInfo.phone}</span>}
+            {personalInfo.linkedin && <a href={personalInfo.linkedin} target="_blank" rel="noreferrer" className="hover:text-zinc-900">LinkedIn</a>}
+            {personalInfo.github && <a href={personalInfo.github} target="_blank" rel="noreferrer" className="hover:text-zinc-900">GitHub</a>}
+          </div>
         </div>
+        {theme.showPhoto && personalInfo.photoUrl && (
+          <img
+            src={personalInfo.photoUrl}
+            alt={personalInfo.fullName}
+            className="w-16 h-16 rounded-full object-cover border border-zinc-300 shadow-xs shrink-0"
+          />
+        )}
       </header>
 
       {/* Summary */}
@@ -150,6 +159,30 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
           </div>
         </section>
       )}
+
+      {/* Custom Sections */}
+      {(resumeData.customSections || []).map((sec) => {
+        if (visibleSections[sec.id] === false || !sec.items?.length) return null;
+        return (
+          <section key={sec.id} className="mt-6">
+            <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-1 mb-2`}>
+              {sec.title}
+            </h2>
+            <div className="space-y-2">
+              {sec.items.map((it, idx) => (
+                <div key={idx}>
+                  <div className="flex justify-between items-baseline">
+                    <span className="font-medium text-zinc-900">{it.title}</span>
+                    {it.date && <span className="text-zinc-400 font-light text-xs">{it.date}</span>}
+                  </div>
+                  {it.subtitle && <p className="text-zinc-500 font-light text-xs">{it.subtitle}</p>}
+                  {it.description && <p className="text-zinc-600 font-light mt-0.5 text-xs leading-relaxed">{it.description}</p>}
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 };

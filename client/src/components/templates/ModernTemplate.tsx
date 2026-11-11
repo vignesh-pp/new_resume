@@ -16,9 +16,14 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
   const bulletIcon = getBulletIcon(theme.bulletStyle);
 
   const defaultOrder = ['summary', 'experience', 'skills', 'projects', 'education', 'certifications'];
-  const sectionOrder = (resumeData.sectionOrder && resumeData.sectionOrder.length > 0)
+  const baseOrder = (resumeData.sectionOrder && resumeData.sectionOrder.length > 0)
     ? resumeData.sectionOrder
     : defaultOrder;
+  const customIds = (resumeData.customSections || []).map((s) => s.id);
+  const sectionOrder = [
+    ...baseOrder,
+    ...customIds.filter((id) => !baseOrder.includes(id)),
+  ];
 
   const leftSections = theme.leftSections || ['skills', 'education', 'certifications'];
   const rightSections = theme.rightSections || ['summary', 'experience', 'projects'];
@@ -198,6 +203,31 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
     );
   };
 
+  // 7. Custom Section Renderer
+  const renderCustomSection = (sec: { id: string; title: string; items: any[] }) => {
+    if (visibleSections[sec.id] === false || !sec.items || sec.items.length === 0) return null;
+    return (
+      <section key={sec.id} className="mt-4">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>{sec.title}</h2>
+        </div>
+        <div className="space-y-3 pl-4 border-l-2 border-slate-100">
+          {sec.items.map((it: any, idx: number) => (
+            <div key={idx}>
+              <div className="flex justify-between items-baseline">
+                <h3 className="font-bold text-slate-900">{it.title}</h3>
+                {it.date && <span className="text-[11px] font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded">{it.date}</span>}
+              </div>
+              {it.subtitle && <p className="text-xs font-semibold" style={{ color: theme.primaryColor }}>{it.subtitle}</p>}
+              {it.description && <p className="text-xs text-slate-600 mt-1 leading-relaxed">{it.description}</p>}
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
   const renderSectionByKey = (key: string) => {
     switch (key) {
       case 'summary':
@@ -212,8 +242,11 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
         return renderEducation();
       case 'certifications':
         return renderCertifications();
-      default:
+      default: {
+        const customSec = (resumeData.customSections || []).find((s) => s.id === key);
+        if (customSec) return renderCustomSection(customSec);
         return null;
+      }
     }
   };
 
@@ -227,15 +260,24 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
 
       {/* Modern Header */}
       <header className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-5 border-b border-slate-200">
-        <div>
-          <h1 className={`${sizeClasses.h1} font-extrabold tracking-tight text-slate-900`}>
-            {personalInfo.fullName}
-          </h1>
-          {personalInfo.jobTitle && (
-            <p className="text-sm font-semibold mt-1" style={{ color: theme.primaryColor }}>
-              {personalInfo.jobTitle}
-            </p>
+        <div className="flex items-center gap-4">
+          {theme.showPhoto && personalInfo.photoUrl && (
+            <img
+              src={personalInfo.photoUrl}
+              alt={personalInfo.fullName}
+              className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-md ring-2 ring-slate-100 shrink-0"
+            />
           )}
+          <div>
+            <h1 className={`${sizeClasses.h1} font-extrabold tracking-tight text-slate-900`}>
+              {personalInfo.fullName}
+            </h1>
+            {personalInfo.jobTitle && (
+              <p className="text-sm font-semibold mt-1" style={{ color: theme.primaryColor }}>
+                {personalInfo.jobTitle}
+              </p>
+            )}
+          </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-slate-600 sm:text-right">
           {personalInfo.email && (

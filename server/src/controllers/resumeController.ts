@@ -13,7 +13,8 @@ export const resumeController = {
 
   async getResumeById(req: Request, res: Response) {
     try {
-      const resume = await storeService.getById(req.params.id);
+      const id = String(req.params.id);
+      const resume = await storeService.getById(id);
       if (!resume) {
         return res.status(404).json({ success: false, error: 'Resume not found' });
       }
@@ -28,7 +29,7 @@ export const resumeController = {
       const { id } = req.body;
       let resume;
       if (id) {
-        resume = await storeService.update(id, req.body);
+        resume = await storeService.update(String(id), req.body);
       }
       if (!resume) {
         resume = await storeService.create(req.body);
@@ -41,7 +42,8 @@ export const resumeController = {
 
   async deleteResume(req: Request, res: Response) {
     try {
-      const deleted = await storeService.delete(req.params.id);
+      const id = String(req.params.id);
+      const deleted = await storeService.delete(id);
       return res.json({ success: deleted });
     } catch (err: any) {
       return res.status(500).json({ success: false, error: err.message });
