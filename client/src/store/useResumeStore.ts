@@ -33,6 +33,8 @@ interface ResumeStoreState {
   removeCertification: (id: string) => void;
   toggleSectionVisibility: (section: string) => void;
   reorderSections: (newOrder: string[]) => void;
+  moveSectionOrder: (sectionKey: string, direction: 'up' | 'down') => void;
+  setSectionColumn: (sectionKey: string, column: 'left' | 'right') => void;
   setTemplate: (templateId: TemplateId) => void;
   setTheme: (theme: Partial<ThemeSettings>) => void;
   setAtsAnalysis: (analysis: AtsScoreBreakdown | null) => void;
@@ -53,6 +55,11 @@ export const useResumeStore = create<ResumeStoreState>((set) => ({
     fontFamily: 'Inter',
     fontSize: 'normal',
     spacing: 'normal',
+    layoutMode: 'single-column',
+    skillsColumns: 2,
+    sideBySideEducationCert: false,
+    leftSections: ['skills', 'education', 'certifications'],
+    rightSections: ['summary', 'experience', 'projects'],
   },
   atsAnalysis: null,
   isAnalyzing: false,
@@ -250,6 +257,42 @@ export const useResumeStore = create<ResumeStoreState>((set) => ({
         sectionOrder: newOrder,
       },
     })),
+
+  moveSectionOrder: (sectionKey, direction) =>
+    set((state) => {
+      const order = [...(state.resumeData.sectionOrder || ['summary', 'experience', 'skills', 'projects', 'education', 'certifications'])];
+      const idx = order.indexOf(sectionKey);
+      if (idx === -1) return state;
+      const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+      if (targetIdx < 0 || targetIdx >= order.length) return state;
+      const temp = order[idx];
+      order[idx] = order[targetIdx];
+      order[targetIdx] = temp;
+      return {
+        resumeData: {
+          ...state.resumeData,
+          sectionOrder: order,
+        },
+      };
+    }),
+
+  setSectionColumn: (sectionKey, column) =>
+    set((state) => {
+      const left = [...(state.theme.leftSections || ['skills', 'education', 'certifications'])].filter((s) => s !== sectionKey);
+      const right = [...(state.theme.rightSections || ['summary', 'experience', 'projects'])].filter((s) => s !== sectionKey);
+      if (column === 'left') {
+        left.push(sectionKey);
+      } else {
+        right.push(sectionKey);
+      }
+      return {
+        theme: {
+          ...state.theme,
+          leftSections: left,
+          rightSections: right,
+        },
+      };
+    }),
 
   setTemplate: (templateId) => set({ activeTemplate: templateId }),
 

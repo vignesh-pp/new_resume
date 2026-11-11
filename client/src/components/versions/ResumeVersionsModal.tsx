@@ -165,3 +165,4 @@ export const ResumeVersionsModal: React.FC<ResumeVersionsModalProps> = ({
     </div>
   );
 };
+

@@ -20,6 +20,219 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     'spacious': 'space-y-5',
   }[theme.spacing] || 'space-y-4';
 
+  const defaultOrder = ['summary', 'experience', 'skills', 'projects', 'education', 'certifications'];
+  const sectionOrder = (resumeData.sectionOrder && resumeData.sectionOrder.length > 0)
+    ? resumeData.sectionOrder
+    : defaultOrder;
+
+  const leftSections = theme.leftSections || ['skills', 'education', 'certifications'];
+  const rightSections = theme.rightSections || ['summary', 'experience', 'projects'];
+  const layoutMode = theme.layoutMode || 'single-column';
+
+  // 1. Render Summary
+  const renderSummary = () => {
+    if (visibleSections.summary === false || !summary) return null;
+    return (
+      <section key="summary">
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5`} style={{ color: theme.primaryColor }}>
+          Professional Summary
+        </h2>
+        <p className="text-gray-800 text-justify leading-relaxed">{summary}</p>
+      </section>
+    );
+  };
+
+  // 2. Render Experience
+  const renderExperience = () => {
+    if (visibleSections.experience === false || !experience || experience.length === 0) return null;
+    return (
+      <section key="experience">
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2`} style={{ color: theme.primaryColor }}>
+          Work Experience
+        </h2>
+        <div className="space-y-3">
+          {experience.map((exp) => (
+            <div key={exp.id}>
+              <div className="flex justify-between items-baseline">
+                <div>
+                  <span className="font-bold text-gray-900">{exp.role}</span>
+                  <span className="text-gray-700"> — {exp.company}</span>
+                  {exp.location && <span className="text-xs text-gray-500"> ({exp.location})</span>}
+                </div>
+                <span className="text-xs text-gray-600 font-medium">
+                  {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
+                </span>
+              </div>
+              {exp.bullets && exp.bullets.length > 0 && (
+                <ul className="mt-1 space-y-1 text-gray-800">
+                  {exp.bullets.map((bullet, idx) => (
+                    <li key={idx} className="flex items-start gap-1.5 leading-relaxed">
+                      <span className="text-gray-500 font-bold shrink-0">{bulletIcon}</span>
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // 3. Render Skills (Respecting skillsColumns)
+  const renderSkills = () => {
+    if (visibleSections.skills === false) return null;
+    const cols = theme.skillsColumns || 2;
+    const gridColsClass = cols === 3 ? 'grid-cols-1 sm:grid-cols-3' : cols === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1';
+
+    return (
+      <section key="skills">
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5`} style={{ color: theme.primaryColor }}>
+          Skills & Competencies
+        </h2>
+        <div className={`grid ${gridColsClass} gap-2 text-gray-800`}>
+          {skills.languages && skills.languages.length > 0 && (
+            <div>
+              <span className="font-bold text-gray-900">Languages: </span>
+              <span>{skills.languages.join(', ')}</span>
+            </div>
+          )}
+          {skills.frameworks && skills.frameworks.length > 0 && (
+            <div>
+              <span className="font-bold text-gray-900">Frameworks: </span>
+              <span>{skills.frameworks.join(', ')}</span>
+            </div>
+          )}
+          {skills.tools && skills.tools.length > 0 && (
+            <div>
+              <span className="font-bold text-gray-900">Cloud & Tools: </span>
+              <span>{skills.tools.join(', ')}</span>
+            </div>
+          )}
+          {skills.softSkills && skills.softSkills.length > 0 && (
+            <div>
+              <span className="font-bold text-gray-900">Competencies: </span>
+              <span>{skills.softSkills.join(', ')}</span>
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  };
+
+  // 4. Render Projects
+  const renderProjects = () => {
+    if (visibleSections.projects === false || !projects || projects.length === 0) return null;
+    return (
+      <section key="projects">
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2`} style={{ color: theme.primaryColor }}>
+          Projects
+        </h2>
+        <div className="space-y-2.5">
+          {projects.map((proj) => (
+            <div key={proj.id}>
+              <div className="flex justify-between items-baseline">
+                <div>
+                  <span className="font-bold text-gray-900">{proj.name}</span>
+                  {proj.technologies && proj.technologies.length > 0 && (
+                    <span className="text-xs text-gray-600"> | {proj.technologies.join(', ')}</span>
+                  )}
+                </div>
+                {proj.url && (
+                  <a href={proj.url} target="_blank" rel="noreferrer" className="text-xs underline text-gray-700">
+                    View Project
+                  </a>
+                )}
+              </div>
+              {proj.description && <p className="text-xs text-gray-700 mt-0.5">{proj.description}</p>}
+              {proj.bullets && proj.bullets.length > 0 && (
+                <ul className="mt-1 space-y-0.5 text-gray-800">
+                  {proj.bullets.map((b, idx) => (
+                    <li key={idx} className="flex items-start gap-1.5">
+                      <span className="text-gray-500 font-bold shrink-0">{bulletIcon}</span>
+                      <span>{b}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // 5. Render Education
+  const renderEducation = () => {
+    if (visibleSections.education === false || !education || education.length === 0) return null;
+    return (
+      <section key="education">
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2`} style={{ color: theme.primaryColor }}>
+          Education
+        </h2>
+        <div className="space-y-2">
+          {education.map((edu) => (
+            <div key={edu.id}>
+              <div className="flex justify-between items-baseline">
+                <div>
+                  <span className="font-bold text-gray-900">{edu.degree} in {edu.fieldOfStudy}</span>
+                  <span className="text-gray-700"> — {edu.institution}</span>
+                  {edu.location && <span className="text-xs text-gray-500"> ({edu.location})</span>}
+                </div>
+                <span className="text-xs text-gray-600 font-medium">
+                  {edu.startDate} – {edu.endDate}
+                </span>
+              </div>
+              {edu.gpa && <p className="text-xs text-gray-600">GPA: {edu.gpa}</p>}
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  // 6. Render Certifications
+  const renderCertifications = () => {
+    if (visibleSections.certifications === false || !certifications || certifications.length === 0) return null;
+    return (
+      <section key="certifications">
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5`} style={{ color: theme.primaryColor }}>
+          Certifications
+        </h2>
+        <ul className="space-y-0.5 text-gray-800">
+          {certifications.map((cert) => (
+            <li key={cert.id} className="flex items-start gap-1.5">
+              <span className="text-gray-500 font-bold shrink-0">{bulletIcon}</span>
+              <span>
+                <strong className="font-semibold">{cert.name}</strong> — {cert.issuer} ({cert.date})
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
+  };
+
+  const renderSectionByKey = (key: string) => {
+    switch (key) {
+      case 'summary':
+        return renderSummary();
+      case 'experience':
+        return renderExperience();
+      case 'skills':
+        return renderSkills();
+      case 'projects':
+        return renderProjects();
+      case 'education':
+        return renderEducation();
+      case 'certifications':
+        return renderCertifications();
+      default:
+        return null;
+    }
+  };
+
   return (
     <div 
       style={fontStyle}
@@ -62,168 +275,55 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
         </div>
       </header>
 
-      {/* Professional Summary */}
-      {visibleSections.summary !== false && summary && (
-        <section>
-          <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5`} style={{ color: theme.primaryColor }}>
-            Professional Summary
-          </h2>
-          <p className="text-gray-800 text-justify leading-relaxed">{summary}</p>
-        </section>
-      )}
-
-      {/* Work Experience */}
-      {visibleSections.experience !== false && experience && experience.length > 0 && (
-        <section>
-          <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2`} style={{ color: theme.primaryColor }}>
-            Work Experience
-          </h2>
-          <div className="space-y-3">
-            {experience.map((exp) => (
-              <div key={exp.id}>
-                <div className="flex justify-between items-baseline">
-                  <div>
-                    <span className="font-bold text-gray-900">{exp.role}</span>
-                    <span className="text-gray-700"> — {exp.company}</span>
-                    {exp.location && <span className="text-xs text-gray-500"> ({exp.location})</span>}
-                  </div>
-                  <span className="text-xs text-gray-600 font-medium">
-                    {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
-                  </span>
+      {/* Main Body - Row vs Column Layout */}
+      {layoutMode === 'single-column' ? (
+        <div className={spacingClass}>
+          {theme.sideBySideEducationCert ? (
+            <>
+              {sectionOrder
+                .filter((s) => s !== 'education' && s !== 'certifications')
+                .map((sec) => renderSectionByKey(sec))}
+              
+              {/* Dual Column Row for Education & Certifications */}
+              {(visibleSections.education !== false || visibleSections.certifications !== false) && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                  <div>{renderEducation()}</div>
+                  <div>{renderCertifications()}</div>
                 </div>
-                {exp.bullets && exp.bullets.length > 0 && (
-                  <ul className="mt-1 space-y-1 text-gray-800">
-                    {exp.bullets.map((bullet, idx) => (
-                      <li key={idx} className="flex items-start gap-1.5 leading-relaxed">
-                        <span className="text-gray-500 font-bold shrink-0">{bulletIcon}</span>
-                        <span>{bullet}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
+              )}
+            </>
+          ) : (
+            sectionOrder.map((sec) => renderSectionByKey(sec))
+          )}
+        </div>
+      ) : layoutMode === 'two-column-left' ? (
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pt-2">
+          <div className="md:col-span-4 space-y-4 border-r border-gray-200 pr-4">
+            {leftSections.map((sec) => renderSectionByKey(sec))}
           </div>
-        </section>
-      )}
-
-      {/* Technical Skills */}
-      {visibleSections.skills !== false && (
-        <section>
-          <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5`} style={{ color: theme.primaryColor }}>
-            Skills & Competencies
-          </h2>
-          <div className="space-y-1 text-gray-800">
-            {skills.languages && skills.languages.length > 0 && (
-              <div>
-                <span className="font-bold text-gray-900">Languages: </span>
-                <span>{skills.languages.join(', ')}</span>
-              </div>
-            )}
-            {skills.frameworks && skills.frameworks.length > 0 && (
-              <div>
-                <span className="font-bold text-gray-900">Frameworks & Libraries: </span>
-                <span>{skills.frameworks.join(', ')}</span>
-              </div>
-            )}
-            {skills.tools && skills.tools.length > 0 && (
-              <div>
-                <span className="font-bold text-gray-900">Cloud, Tools & Databases: </span>
-                <span>{skills.tools.join(', ')}</span>
-              </div>
-            )}
-            {skills.technical && skills.technical.length > 0 && (
-              <div>
-                <span className="font-bold text-gray-900">Core Concepts: </span>
-                <span>{skills.technical.join(', ')}</span>
-              </div>
-            )}
+          <div className="md:col-span-8 space-y-4">
+            {rightSections.map((sec) => renderSectionByKey(sec))}
           </div>
-        </section>
-      )}
-
-      {/* Key Projects */}
-      {visibleSections.projects !== false && projects && projects.length > 0 && (
-        <section>
-          <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2`} style={{ color: theme.primaryColor }}>
-            Projects
-          </h2>
-          <div className="space-y-2.5">
-            {projects.map((proj) => (
-              <div key={proj.id}>
-                <div className="flex justify-between items-baseline">
-                  <div>
-                    <span className="font-bold text-gray-900">{proj.name}</span>
-                    {proj.technologies && proj.technologies.length > 0 && (
-                      <span className="text-xs text-gray-600"> | {proj.technologies.join(', ')}</span>
-                    )}
-                  </div>
-                  {proj.url && (
-                    <a href={proj.url} target="_blank" rel="noreferrer" className="text-xs underline text-gray-700">
-                      View Project
-                    </a>
-                  )}
-                </div>
-                {proj.description && <p className="text-xs text-gray-700 mt-0.5">{proj.description}</p>}
-                {proj.bullets && proj.bullets.length > 0 && (
-                  <ul className="mt-1 space-y-0.5 text-gray-800">
-                    {proj.bullets.map((b, idx) => (
-                      <li key={idx} className="flex items-start gap-1.5">
-                        <span className="text-gray-500 font-bold shrink-0">{bulletIcon}</span>
-                        <span>{b}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
+        </div>
+      ) : layoutMode === 'two-column-right' ? (
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pt-2">
+          <div className="md:col-span-8 space-y-4 border-r border-gray-200 pr-4">
+            {rightSections.map((sec) => renderSectionByKey(sec))}
           </div>
-        </section>
-      )}
-
-      {/* Education */}
-      {visibleSections.education !== false && education && education.length > 0 && (
-        <section>
-          <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2`} style={{ color: theme.primaryColor }}>
-            Education
-          </h2>
-          <div className="space-y-2">
-            {education.map((edu) => (
-              <div key={edu.id}>
-                <div className="flex justify-between items-baseline">
-                  <div>
-                    <span className="font-bold text-gray-900">{edu.degree} in {edu.fieldOfStudy}</span>
-                    <span className="text-gray-700"> — {edu.institution}</span>
-                    {edu.location && <span className="text-xs text-gray-500"> ({edu.location})</span>}
-                  </div>
-                  <span className="text-xs text-gray-600">
-                    {edu.startDate} – {edu.endDate}
-                  </span>
-                </div>
-                {edu.gpa && <p className="text-xs text-gray-600">GPA: {edu.gpa}</p>}
-              </div>
-            ))}
+          <div className="md:col-span-4 space-y-4">
+            {leftSections.map((sec) => renderSectionByKey(sec))}
           </div>
-        </section>
-      )}
-
-      {/* Certifications */}
-      {visibleSections.certifications !== false && certifications && certifications.length > 0 && (
-        <section>
-          <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5`} style={{ color: theme.primaryColor }}>
-            Certifications
-          </h2>
-          <ul className="space-y-0.5 text-gray-800">
-            {certifications.map((cert) => (
-              <li key={cert.id} className="flex items-start gap-1.5">
-                <span className="text-gray-500 font-bold shrink-0">{bulletIcon}</span>
-                <span>
-                  <strong className="font-semibold">{cert.name}</strong> — {cert.issuer} ({cert.date})
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
+        </div>
+      ) : (
+        /* Equal 50/50 Columns */
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+          <div className="space-y-4 border-r border-gray-200 pr-4">
+            {leftSections.map((sec) => renderSectionByKey(sec))}
+          </div>
+          <div className="space-y-4">
+            {rightSections.map((sec) => renderSectionByKey(sec))}
+          </div>
+        </div>
       )}
     </div>
   );

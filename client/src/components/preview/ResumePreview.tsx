@@ -4,7 +4,7 @@ import { ResumeRenderer } from '../templates/ResumeRenderer';
 import { TemplateStrip } from './TemplateStrip';
 import { 
   ZoomIn, ZoomOut, RotateCcw, Printer, Download, Type, 
-  Eye, FileText, Maximize2 
+  Eye, FileText, Maximize2, Columns 
 } from 'lucide-react';
 
 interface ResumePreviewProps {
@@ -12,6 +12,7 @@ interface ResumePreviewProps {
   onDownloadPdf?: () => void;
   onDownloadDocx?: () => void;
   onOpenFontModal?: () => void;
+  onOpenLayoutModal?: () => void;
 }
 
 export const ResumePreview: React.FC<ResumePreviewProps> = ({
@@ -19,6 +20,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
   onDownloadPdf,
   onDownloadDocx,
   onOpenFontModal,
+  onOpenLayoutModal,
 }) => {
   const { resumeData, activeTemplate, theme, zoom, setZoom, setTheme } = useResumeStore();
   const printRef = useRef<HTMLDivElement>(null);
@@ -43,6 +45,17 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
             >
               <Type className="w-3.5 h-3.5" />
               <span>Font: {theme.fontFamily}</span>
+            </button>
+          )}
+
+          {onOpenLayoutModal && (
+            <button
+              onClick={onOpenLayoutModal}
+              className="px-2 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50/70 text-indigo-800 hover:bg-indigo-100 transition-colors flex items-center gap-1 text-xs font-semibold"
+              title="Columns and section reordering"
+            >
+              <Columns className="w-3.5 h-3.5 text-indigo-600" />
+              <span className="hidden sm:inline">Columns & Rows</span>
             </button>
           )}
 

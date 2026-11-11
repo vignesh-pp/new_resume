@@ -228,3 +228,4 @@ export const FontPickerModal: React.FC<FontPickerModalProps> = ({ isOpen, onClos
     </div>
   );
 };
+

@@ -126,3 +126,4 @@ export function getBulletIcon(style?: string) {
       return '•';
   }
 }
+

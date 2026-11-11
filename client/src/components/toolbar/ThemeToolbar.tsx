@@ -1,7 +1,7 @@
 import React from 'react';
 import { useResumeStore } from '../../store/useResumeStore';
 import { TEMPLATES_CONFIG } from '../../utils/templateDefinitions';
-import { Palette, Type, LayoutTemplate, Sparkles, Upload, FolderOpen } from 'lucide-react';
+import { Palette, Type, LayoutTemplate, Sparkles, Upload, FolderOpen, Columns } from 'lucide-react';
 
 interface ThemeToolbarProps {
   onUploadClick: () => void;
@@ -9,6 +9,7 @@ interface ThemeToolbarProps {
   onTailorClick: () => void;
   onOpenFontModal: () => void;
   onOpenVersionsModal: () => void;
+  onOpenLayoutModal: () => void;
 }
 
 export const ThemeToolbar: React.FC<ThemeToolbarProps> = ({
@@ -17,6 +18,7 @@ export const ThemeToolbar: React.FC<ThemeToolbarProps> = ({
   onTailorClick,
   onOpenFontModal,
   onOpenVersionsModal,
+  onOpenLayoutModal,
 }) => {
   const {
     activeTemplate,
@@ -94,6 +96,16 @@ export const ThemeToolbar: React.FC<ThemeToolbarProps> = ({
           <Type className="w-3.5 h-3.5 text-blue-600" />
           <span>Font: <strong className="font-bold text-slate-900">{theme.fontFamily}</strong></span>
           <span className="text-[10px] bg-blue-100 text-blue-700 px-1 rounded font-normal">Change</span>
+        </button>
+
+        {/* Layout & Columns Button */}
+        <button
+          onClick={onOpenLayoutModal}
+          className="px-2.5 py-1 rounded-lg border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100 text-indigo-900 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-2xs"
+          title="Reorder sections and switch row/column layouts"
+        >
+          <Columns className="w-3.5 h-3.5 text-indigo-600" />
+          <span>Columns & Reorder</span>
         </button>
 
         {/* Colors Swatches */}

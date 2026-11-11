@@ -11,6 +11,7 @@ import { JobTailorModal } from './components/ai-tools/JobTailorModal';
 import { UploadModal } from './components/upload/UploadModal';
 import { FontPickerModal } from './components/toolbar/FontPickerModal';
 import { ResumeVersionsModal } from './components/versions/ResumeVersionsModal';
+import { LayoutManagerModal } from './components/toolbar/LayoutManagerModal';
 import { exportUtils } from './utils/exportUtils';
 import axios from 'axios';
 
@@ -28,6 +29,7 @@ export function App() {
   const [isAtsModalOpen, setIsAtsModalOpen] = useState(false);
   const [isFontModalOpen, setIsFontModalOpen] = useState(false);
   const [isVersionsModalOpen, setIsVersionsModalOpen] = useState(false);
+  const [isLayoutModalOpen, setIsLayoutModalOpen] = useState(false);
 
   // Trigger ATS analysis
   const runAtsAnalysis = async () => {
@@ -108,6 +110,7 @@ export function App() {
             onTailorClick={() => setShowTailorModal(true)}
             onOpenFontModal={() => setIsFontModalOpen(true)}
             onOpenVersionsModal={() => setIsVersionsModalOpen(true)}
+            onOpenLayoutModal={() => setIsLayoutModalOpen(true)}
           />
 
           {/* Split Pane: Left Editor | Right Live Preview */}
@@ -124,6 +127,7 @@ export function App() {
                 onDownloadPdf={handleDownloadPdf}
                 onDownloadDocx={handleDownloadDocx}
                 onOpenFontModal={() => setIsFontModalOpen(true)}
+                onOpenLayoutModal={() => setIsLayoutModalOpen(true)}
               />
             </div>
           </div>
@@ -150,6 +154,11 @@ export function App() {
       <ResumeVersionsModal
         isOpen={isVersionsModalOpen}
         onClose={() => setIsVersionsModalOpen(false)}
+      />
+
+      <LayoutManagerModal
+        isOpen={isLayoutModalOpen}
+        onClose={() => setIsLayoutModalOpen(false)}
       />
 
       <BulletEnhancerModal />

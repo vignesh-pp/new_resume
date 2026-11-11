@@ -108,6 +108,12 @@ export type FontOption =
   | 'JetBrains Mono' 
   | 'Fira Code';
 
+export type ColumnLayoutMode = 
+  | 'single-column' 
+  | 'two-column-left' 
+  | 'two-column-right' 
+  | 'two-column-equal';
+
 export interface ThemeSettings {
   primaryColor: string;
   secondaryColor?: string;
@@ -119,6 +125,11 @@ export interface ThemeSettings {
   showPhoto?: boolean;
   showPageBreakGuide?: boolean;
   paperShadow?: 'none' | 'subtle' | 'elevated' | 'floating';
+  layoutMode?: ColumnLayoutMode;
+  skillsColumns?: 1 | 2 | 3;
+  sideBySideEducationCert?: boolean;
+  leftSections?: string[];
+  rightSections?: string[];
 }
 
 export interface AtsScoreBreakdown {

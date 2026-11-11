@@ -46,3 +46,4 @@ export const TemplateStrip: React.FC = () => {
     </div>
   );
 };
+
