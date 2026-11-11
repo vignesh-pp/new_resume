@@ -98,3 +98,4 @@ def create_docx(resume: ResumeSchema, template: str = Query("classic-ats")):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"DOCX generation failed: {str(e)}")
+

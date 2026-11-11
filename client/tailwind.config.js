@@ -8,10 +8,14 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        serif: ['Merriweather', 'serif'],
-        mono: ['JetBrains Mono', 'monospace'],
-        display: ['Poppins', 'sans-serif'],
+        sans: ['Inter', 'Plus Jakarta Sans', 'sans-serif'],
+        serif: ['Merriweather', 'Lora', 'serif'],
+        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+        display: ['Poppins', 'Montserrat', 'sans-serif'],
+        playfair: ['"Playfair Display"', 'serif'],
+        lora: ['Lora', 'serif'],
+        montserrat: ['Montserrat', 'sans-serif'],
+        jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
       },
       screens: {
         'print': { 'raw': 'print' },
@@ -20,3 +24,4 @@ export default {
   },
   plugins: [],
 }
+

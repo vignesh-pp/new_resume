@@ -315,3 +315,4 @@ export const designerResume: ResumeSchema = {
     certifications: true
   }
 };
+

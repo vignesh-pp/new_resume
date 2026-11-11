@@ -1,5 +1,6 @@
 import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
+import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
 
 interface TemplateProps {
   resumeData: ResumeSchema;
@@ -9,19 +10,18 @@ interface TemplateProps {
 export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) => {
   const { personalInfo, summary, experience, education, skills, projects, certifications, visibleSections } = resumeData;
 
-  const fontClass = {
-    'Inter': 'font-sans',
-    'Roboto': 'font-sans',
-    'Merriweather': 'font-serif',
-    'JetBrains Mono': 'font-mono',
-    'Poppins': 'font-display',
-  }[theme.fontFamily] || 'font-sans';
+  const fontStyle = { fontFamily: getFontFamilyCss(theme.fontFamily) };
+  const sizeClasses = getFontSizeClasses(theme.fontSize);
+  const bulletIcon = getBulletIcon(theme.bulletStyle);
 
   return (
-    <div className={`w-full max-w-[800px] mx-auto bg-white text-zinc-900 p-10 shadow-sm ${fontClass} text-sm print:p-0 print:shadow-none`}>
+    <div 
+      style={fontStyle}
+      className={`w-full max-w-[800px] mx-auto bg-white text-zinc-900 p-10 shadow-sm ${sizeClasses.body} print:p-0 print:shadow-none`}
+    >
       {/* Clean Minimal Header */}
       <header className="mb-8">
-        <h1 className="text-3xl font-light tracking-tight text-zinc-950 uppercase">
+        <h1 className={`${sizeClasses.h1} font-light tracking-tight text-zinc-950 uppercase`}>
           {personalInfo.fullName}
         </h1>
         {personalInfo.jobTitle && (
@@ -41,14 +41,14 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
       {/* Summary */}
       {visibleSections.summary !== false && summary && (
         <section className="mb-6">
-          <p className="text-xs text-zinc-700 leading-relaxed font-light">{summary}</p>
+          <p className="text-zinc-700 leading-relaxed font-light">{summary}</p>
         </section>
       )}
 
       {/* Experience */}
       {visibleSections.experience !== false && experience && experience.length > 0 && (
         <section className="mb-6">
-          <h2 className="text-[11px] font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-1 mb-3">
+          <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-1 mb-3`}>
             Experience
           </h2>
           <div className="space-y-4">
@@ -56,19 +56,20 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
               <div key={exp.id}>
                 <div className="flex justify-between items-baseline">
                   <div>
-                    <span className="font-medium text-zinc-900 text-xs">{exp.role}</span>
+                    <span className="font-medium text-zinc-900">{exp.role}</span>
                     <span className="text-zinc-400">, </span>
-                    <span className="text-xs text-zinc-600">{exp.company}</span>
+                    <span className="text-zinc-600">{exp.company}</span>
                   </div>
                   <span className="text-[11px] text-zinc-400 font-light">
                     {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
                   </span>
                 </div>
                 {exp.bullets && exp.bullets.length > 0 && (
-                  <ul className="mt-1.5 space-y-1 text-xs text-zinc-600 font-light">
+                  <ul className="mt-1.5 space-y-1 text-zinc-600 font-light">
                     {exp.bullets.map((b, idx) => (
-                      <li key={idx} className="leading-relaxed pl-2 border-l border-zinc-200">
-                        {b}
+                      <li key={idx} className="leading-relaxed pl-2 border-l border-zinc-200 flex items-start gap-1.5">
+                        <span className="text-zinc-400 font-medium shrink-0">{bulletIcon}</span>
+                        <span>{b}</span>
                       </li>
                     ))}
                   </ul>
@@ -82,10 +83,10 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
       {/* Skills */}
       {visibleSections.skills !== false && (
         <section className="mb-6">
-          <h2 className="text-[11px] font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-1 mb-2">
+          <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-1 mb-2`}>
             Competencies
           </h2>
-          <div className="grid grid-cols-2 gap-3 text-xs text-zinc-700 font-light">
+          <div className="grid grid-cols-2 gap-3 text-zinc-700 font-light">
             {skills.languages && skills.languages.length > 0 && (
               <div>
                 <span className="font-normal text-zinc-900 block mb-0.5">Languages</span>
@@ -111,19 +112,19 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
       {/* Projects */}
       {visibleSections.projects !== false && projects && projects.length > 0 && (
         <section className="mb-6">
-          <h2 className="text-[11px] font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-1 mb-3">
+          <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-1 mb-3`}>
             Selected Work
           </h2>
           <div className="space-y-3">
             {projects.map((p) => (
               <div key={p.id}>
                 <div className="flex justify-between items-baseline">
-                  <span className="text-xs font-medium text-zinc-900">{p.name}</span>
+                  <span className="font-medium text-zinc-900">{p.name}</span>
                   {p.technologies && (
                     <span className="text-[11px] text-zinc-400 font-light">{p.technologies.join(', ')}</span>
                   )}
                 </div>
-                {p.description && <p className="text-xs text-zinc-600 font-light mt-0.5">{p.description}</p>}
+                {p.description && <p className="text-zinc-600 font-light mt-0.5">{p.description}</p>}
               </div>
             ))}
           </div>
@@ -133,12 +134,12 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
       {/* Education */}
       {visibleSections.education !== false && education && education.length > 0 && (
         <section>
-          <h2 className="text-[11px] font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-1 mb-2">
+          <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-1 mb-2`}>
             Education
           </h2>
           <div className="space-y-2">
             {education.map((edu) => (
-              <div key={edu.id} className="flex justify-between items-baseline text-xs">
+              <div key={edu.id} className="flex justify-between items-baseline">
                 <div>
                   <span className="font-medium text-zinc-900">{edu.degree} in {edu.fieldOfStudy}</span>
                   <span className="text-zinc-500"> — {edu.institution}</span>

@@ -291,3 +291,4 @@ def extract_resume_data(text: str, lines: List[str]) -> ResumeSchema:
 
     # Fallback to local heuristic extractor
     return parse_with_heuristics(text, lines)
+

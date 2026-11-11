@@ -96,11 +96,29 @@ export type TemplateId =
   | 'technical'
   | 'academic';
 
+export type FontOption = 
+  | 'Inter' 
+  | 'Plus Jakarta Sans' 
+  | 'Roboto' 
+  | 'Montserrat' 
+  | 'Poppins' 
+  | 'Merriweather' 
+  | 'Playfair Display' 
+  | 'Lora' 
+  | 'JetBrains Mono' 
+  | 'Fira Code';
+
 export interface ThemeSettings {
   primaryColor: string;
-  fontFamily: 'Inter' | 'Roboto' | 'Merriweather' | 'JetBrains Mono' | 'Poppins';
-  fontSize: 'compact' | 'normal' | 'relaxed';
+  secondaryColor?: string;
+  fontFamily: FontOption;
+  fontSize: 'compact' | 'normal' | 'relaxed' | 'large';
   spacing: 'compact' | 'normal' | 'spacious';
+  bulletStyle?: 'circle' | 'dash' | 'diamond' | 'caret' | 'check';
+  accentGradient?: boolean;
+  showPhoto?: boolean;
+  showPageBreakGuide?: boolean;
+  paperShadow?: 'none' | 'subtle' | 'elevated' | 'floating';
 }
 
 export interface AtsScoreBreakdown {
@@ -125,3 +143,4 @@ export interface TemplateMeta {
   layoutType: '1-Column' | '2-Column' | 'Sidebar' | 'Split';
   description: string;
 }
+

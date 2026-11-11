@@ -1,5 +1,6 @@
 import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
+import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
 
 interface TemplateProps {
   resumeData: ResumeSchema;
@@ -9,26 +10,25 @@ interface TemplateProps {
 export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) => {
   const { personalInfo, summary, experience, education, skills, projects, certifications, visibleSections } = resumeData;
 
-  const fontClass = {
-    'Inter': 'font-sans',
-    'Roboto': 'font-sans',
-    'Merriweather': 'font-serif',
-    'JetBrains Mono': 'font-mono',
-    'Poppins': 'font-display',
-  }[theme.fontFamily] || 'font-sans';
+  const fontStyle = { fontFamily: getFontFamilyCss(theme.fontFamily) };
+  const sizeClasses = getFontSizeClasses(theme.fontSize);
+  const bulletIcon = getBulletIcon(theme.bulletStyle);
 
   const spacingClass = {
-    'compact': 'space-y-3 text-xs leading-snug',
-    'normal': 'space-y-4 text-sm leading-normal',
-    'spacious': 'space-y-5 text-sm leading-relaxed',
-  }[theme.spacing] || 'space-y-4 text-sm';
+    'compact': 'space-y-2.5',
+    'normal': 'space-y-4',
+    'spacious': 'space-y-5',
+  }[theme.spacing] || 'space-y-4';
 
   return (
-    <div className={`w-full max-w-[800px] mx-auto bg-white text-gray-900 p-8 shadow-sm ${fontClass} ${spacingClass} print:p-0 print:shadow-none`}>
+    <div 
+      style={fontStyle}
+      className={`w-full max-w-[800px] mx-auto bg-white text-gray-900 p-8 shadow-sm ${sizeClasses.body} ${spacingClass} print:p-0 print:shadow-none`}
+    >
       {/* Header */}
       <header className="text-center border-b pb-3 border-gray-400">
         <h1 
-          className="text-2xl font-bold tracking-tight uppercase"
+          className={`${sizeClasses.h1} font-bold tracking-tight uppercase`}
           style={{ color: theme.primaryColor }}
         >
           {personalInfo.fullName}
@@ -65,17 +65,17 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
       {/* Professional Summary */}
       {visibleSections.summary !== false && summary && (
         <section>
-          <h2 className="text-xs font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5" style={{ color: theme.primaryColor }}>
+          <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5`} style={{ color: theme.primaryColor }}>
             Professional Summary
           </h2>
-          <p className="text-gray-800 text-justify text-xs leading-relaxed">{summary}</p>
+          <p className="text-gray-800 text-justify leading-relaxed">{summary}</p>
         </section>
       )}
 
       {/* Work Experience */}
       {visibleSections.experience !== false && experience && experience.length > 0 && (
         <section>
-          <h2 className="text-xs font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2" style={{ color: theme.primaryColor }}>
+          <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2`} style={{ color: theme.primaryColor }}>
             Work Experience
           </h2>
           <div className="space-y-3">
@@ -92,9 +92,12 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
                   </span>
                 </div>
                 {exp.bullets && exp.bullets.length > 0 && (
-                  <ul className="list-disc list-outside ml-4 mt-1 space-y-1 text-xs text-gray-800">
+                  <ul className="mt-1 space-y-1 text-gray-800">
                     {exp.bullets.map((bullet, idx) => (
-                      <li key={idx} className="leading-relaxed">{bullet}</li>
+                      <li key={idx} className="flex items-start gap-1.5 leading-relaxed">
+                        <span className="text-gray-500 font-bold shrink-0">{bulletIcon}</span>
+                        <span>{bullet}</span>
+                      </li>
                     ))}
                   </ul>
                 )}
@@ -107,10 +110,10 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
       {/* Technical Skills */}
       {visibleSections.skills !== false && (
         <section>
-          <h2 className="text-xs font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5" style={{ color: theme.primaryColor }}>
+          <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5`} style={{ color: theme.primaryColor }}>
             Skills & Competencies
           </h2>
-          <div className="space-y-1 text-xs text-gray-800">
+          <div className="space-y-1 text-gray-800">
             {skills.languages && skills.languages.length > 0 && (
               <div>
                 <span className="font-bold text-gray-900">Languages: </span>
@@ -142,7 +145,7 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
       {/* Key Projects */}
       {visibleSections.projects !== false && projects && projects.length > 0 && (
         <section>
-          <h2 className="text-xs font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2" style={{ color: theme.primaryColor }}>
+          <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2`} style={{ color: theme.primaryColor }}>
             Projects
           </h2>
           <div className="space-y-2.5">
@@ -163,9 +166,12 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
                 </div>
                 {proj.description && <p className="text-xs text-gray-700 mt-0.5">{proj.description}</p>}
                 {proj.bullets && proj.bullets.length > 0 && (
-                  <ul className="list-disc list-outside ml-4 mt-1 space-y-0.5 text-xs text-gray-800">
+                  <ul className="mt-1 space-y-0.5 text-gray-800">
                     {proj.bullets.map((b, idx) => (
-                      <li key={idx}>{b}</li>
+                      <li key={idx} className="flex items-start gap-1.5">
+                        <span className="text-gray-500 font-bold shrink-0">{bulletIcon}</span>
+                        <span>{b}</span>
+                      </li>
                     ))}
                   </ul>
                 )}
@@ -178,7 +184,7 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
       {/* Education */}
       {visibleSections.education !== false && education && education.length > 0 && (
         <section>
-          <h2 className="text-xs font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2" style={{ color: theme.primaryColor }}>
+          <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2`} style={{ color: theme.primaryColor }}>
             Education
           </h2>
           <div className="space-y-2">
@@ -204,13 +210,16 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
       {/* Certifications */}
       {visibleSections.certifications !== false && certifications && certifications.length > 0 && (
         <section>
-          <h2 className="text-xs font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5" style={{ color: theme.primaryColor }}>
+          <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5`} style={{ color: theme.primaryColor }}>
             Certifications
           </h2>
-          <ul className="list-disc list-outside ml-4 space-y-0.5 text-xs text-gray-800">
+          <ul className="space-y-0.5 text-gray-800">
             {certifications.map((cert) => (
-              <li key={cert.id}>
-                <span className="font-semibold">{cert.name}</span> — {cert.issuer} ({cert.date})
+              <li key={cert.id} className="flex items-start gap-1.5">
+                <span className="text-gray-500 font-bold shrink-0">{bulletIcon}</span>
+                <span>
+                  <strong className="font-semibold">{cert.name}</strong> — {cert.issuer} ({cert.date})
+                </span>
               </li>
             ))}
           </ul>

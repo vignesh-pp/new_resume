@@ -72,3 +72,4 @@ export const TEMPLATES_CONFIG: TemplateMeta[] = [
     description: 'Formal scholarly format designed for in-depth chronological research, publications, conference presentations, teaching appointments, and academic grants.',
   },
 ];
+

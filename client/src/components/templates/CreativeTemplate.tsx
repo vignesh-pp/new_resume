@@ -1,6 +1,7 @@
 import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
 import { Mail, Phone, MapPin, Globe, Linkedin, Github } from 'lucide-react';
+import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
 
 interface TemplateProps {
   resumeData: ResumeSchema;
@@ -10,16 +11,15 @@ interface TemplateProps {
 export const CreativeTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) => {
   const { personalInfo, summary, experience, education, skills, projects, certifications, visibleSections } = resumeData;
 
-  const fontClass = {
-    'Inter': 'font-sans',
-    'Roboto': 'font-sans',
-    'Merriweather': 'font-serif',
-    'JetBrains Mono': 'font-mono',
-    'Poppins': 'font-display',
-  }[theme.fontFamily] || 'font-display';
+  const fontStyle = { fontFamily: getFontFamilyCss(theme.fontFamily) };
+  const sizeClasses = getFontSizeClasses(theme.fontSize);
+  const bulletIcon = getBulletIcon(theme.bulletStyle);
 
   return (
-    <div className={`w-full max-w-[800px] mx-auto bg-white shadow-sm flex flex-col sm:flex-row ${fontClass} text-sm print:p-0 print:shadow-none min-h-[1050px]`}>
+    <div 
+      style={fontStyle}
+      className={`w-full max-w-[800px] mx-auto bg-white shadow-sm flex flex-col sm:flex-row ${sizeClasses.body} print:p-0 print:shadow-none min-h-[1050px]`}
+    >
       {/* Left Sidebar (35%) */}
       <aside className="w-full sm:w-[35%] bg-slate-900 text-slate-100 p-6 flex flex-col gap-6">
         {/* Profile Circle / Initials */}
@@ -147,17 +147,17 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
         {/* Profile Summary */}
         {visibleSections.summary !== false && summary && (
           <section>
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-1 mb-2" style={{ borderColor: theme.primaryColor }}>
+            <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-1 mb-2`} style={{ borderColor: theme.primaryColor }}>
               Profile
             </h2>
-            <p className="text-xs text-slate-600 leading-relaxed">{summary}</p>
+            <p className="leading-relaxed text-slate-600">{summary}</p>
           </section>
         )}
 
         {/* Work Experience */}
         {visibleSections.experience !== false && experience && experience.length > 0 && (
           <section>
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-1 mb-3" style={{ borderColor: theme.primaryColor }}>
+            <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-1 mb-3`} style={{ borderColor: theme.primaryColor }}>
               Experience
             </h2>
             <div className="space-y-4">
@@ -173,10 +173,10 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
                     {exp.company}
                   </p>
                   {exp.bullets && exp.bullets.length > 0 && (
-                    <ul className="space-y-1 text-xs text-slate-600">
+                    <ul className="space-y-1 text-slate-600">
                       {exp.bullets.map((b, idx) => (
                         <li key={idx} className="flex items-start gap-1.5 leading-relaxed">
-                          <span className="text-slate-400 mt-1">•</span>
+                          <span className="text-slate-400 font-bold shrink-0 mt-0.5">{bulletIcon}</span>
                           <span>{b}</span>
                         </li>
                       ))}
@@ -191,7 +191,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
         {/* Featured Projects */}
         {visibleSections.projects !== false && projects && projects.length > 0 && (
           <section>
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-1 mb-3" style={{ borderColor: theme.primaryColor }}>
+            <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-1 mb-3`} style={{ borderColor: theme.primaryColor }}>
               Featured Case Studies & Work
             </h2>
             <div className="space-y-3">
@@ -205,7 +205,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
                       </a>
                     )}
                   </div>
-                  {p.description && <p className="text-xs text-slate-600 mt-1">{p.description}</p>}
+                  {p.description && <p className="text-slate-600 mt-1">{p.description}</p>}
                 </div>
               ))}
             </div>

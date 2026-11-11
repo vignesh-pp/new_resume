@@ -1,6 +1,7 @@
 import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
 import { Mail, Phone, MapPin, Globe, Linkedin, Github } from 'lucide-react';
+import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
 
 interface TemplateProps {
   resumeData: ResumeSchema;
@@ -10,27 +11,26 @@ interface TemplateProps {
 export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) => {
   const { personalInfo, summary, experience, education, skills, projects, certifications, visibleSections } = resumeData;
 
-  const fontClass = {
-    'Inter': 'font-sans',
-    'Roboto': 'font-sans',
-    'Merriweather': 'font-serif',
-    'JetBrains Mono': 'font-mono',
-    'Poppins': 'font-display',
-  }[theme.fontFamily] || 'font-sans';
+  const fontStyle = { fontFamily: getFontFamilyCss(theme.fontFamily) };
+  const sizeClasses = getFontSizeClasses(theme.fontSize);
+  const bulletIcon = getBulletIcon(theme.bulletStyle);
 
   return (
-    <div className={`w-full max-w-[800px] mx-auto bg-white text-slate-800 p-8 shadow-sm ${fontClass} text-sm print:p-0 print:shadow-none`}>
+    <div 
+      style={fontStyle}
+      className={`w-full max-w-[800px] mx-auto bg-white text-slate-800 p-8 shadow-sm ${sizeClasses.body} print:p-0 print:shadow-none`}
+    >
       {/* Top accent line */}
       <div className="h-1.5 w-full rounded-full mb-6" style={{ backgroundColor: theme.primaryColor }} />
 
       {/* Modern Header */}
       <header className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-5 border-b border-slate-200">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+          <h1 className={`${sizeClasses.h1} font-extrabold tracking-tight text-slate-900`}>
             {personalInfo.fullName}
           </h1>
           {personalInfo.jobTitle && (
-            <p className="text-base font-semibold mt-1" style={{ color: theme.primaryColor }}>
+            <p className="text-sm font-semibold mt-1" style={{ color: theme.primaryColor }}>
               {personalInfo.jobTitle}
             </p>
           )}
@@ -80,9 +80,9 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
         <section className="mt-5">
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900">About Me</h2>
+            <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>About Me</h2>
           </div>
-          <p className="text-xs leading-relaxed text-slate-600 pl-4 border-l-2 border-slate-100">{summary}</p>
+          <p className="leading-relaxed text-slate-600 pl-4 border-l-2 border-slate-100">{summary}</p>
         </section>
       )}
 
@@ -91,14 +91,14 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
         <section className="mt-5">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900">Experience</h2>
+            <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>Experience</h2>
           </div>
           <div className="space-y-4 pl-4 border-l-2 border-slate-100">
             {experience.map((exp) => (
               <div key={exp.id} className="relative">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900">{exp.role}</h3>
+                    <h3 className="font-bold text-slate-900">{exp.role}</h3>
                     <p className="text-xs font-semibold" style={{ color: theme.primaryColor }}>
                       {exp.company} {exp.location && <span className="text-slate-400 font-normal">| {exp.location}</span>}
                     </p>
@@ -108,10 +108,10 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
                   </span>
                 </div>
                 {exp.bullets && exp.bullets.length > 0 && (
-                  <ul className="mt-2 space-y-1 text-xs text-slate-600">
+                  <ul className="mt-2 space-y-1 text-slate-600">
                     {exp.bullets.map((b, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <span className="text-slate-400 mt-1">•</span>
+                        <span className="text-slate-400 font-bold mt-0.5">{bulletIcon}</span>
                         <span className="leading-relaxed">{b}</span>
                       </li>
                     ))}
@@ -128,7 +128,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
         <section className="mt-5">
           <div className="flex items-center gap-2 mb-2.5">
             <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900">Skills & Tech Stack</h2>
+            <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>Skills & Tech Stack</h2>
           </div>
           <div className="pl-4 border-l-2 border-slate-100 space-y-2 text-xs">
             {skills.languages && skills.languages.length > 0 && (
@@ -170,7 +170,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
         <section className="mt-5">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900">Featured Projects</h2>
+            <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>Featured Projects</h2>
           </div>
           <div className="space-y-3 pl-4 border-l-2 border-slate-100">
             {projects.map((p) => (
@@ -190,7 +190,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
                     </a>
                   )}
                 </div>
-                {p.description && <p className="text-xs text-slate-600 mt-0.5">{p.description}</p>}
+                {p.description && <p className="text-slate-600 mt-0.5">{p.description}</p>}
               </div>
             ))}
           </div>
@@ -202,7 +202,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
         <section className="mt-5">
           <div className="flex items-center gap-2 mb-2.5">
             <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900">Education</h2>
+            <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>Education</h2>
           </div>
           <div className="space-y-2 pl-4 border-l-2 border-slate-100">
             {education.map((edu) => (

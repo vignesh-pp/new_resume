@@ -10,3 +10,4 @@ router.put('/:id', resumeController.saveResume);
 router.delete('/:id', resumeController.deleteResume);
 
 export default router;
+

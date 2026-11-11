@@ -1,5 +1,6 @@
 import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
+import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
 
 interface TemplateProps {
   resumeData: ResumeSchema;
@@ -9,22 +10,29 @@ interface TemplateProps {
 export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) => {
   const { personalInfo, summary, experience, education, skills, certifications, visibleSections } = resumeData;
 
+  const fontStyle = { fontFamily: getFontFamilyCss(theme.fontFamily) };
+  const sizeClasses = getFontSizeClasses(theme.fontSize);
+  const bulletIcon = getBulletIcon(theme.bulletStyle);
+
   return (
-    <div className="w-full max-w-[800px] mx-auto bg-white text-slate-900 p-8 shadow-sm font-serif text-sm print:p-0 print:shadow-none">
+    <div 
+      style={fontStyle}
+      className={`w-full max-w-[800px] mx-auto bg-white text-slate-900 p-8 shadow-sm ${sizeClasses.body} print:p-0 print:shadow-none`}
+    >
       {/* Executive Double Border Header */}
       <header className="text-center pb-4 border-b-2 border-slate-900">
         <h1 
-          className="text-3xl font-normal tracking-wide uppercase"
+          className={`${sizeClasses.h1} font-normal tracking-wide uppercase`}
           style={{ color: theme.primaryColor }}
         >
           {personalInfo.fullName}
         </h1>
         {personalInfo.jobTitle && (
-          <p className="text-sm font-sans tracking-widest text-slate-600 uppercase mt-1">
+          <p className="text-sm tracking-widest text-slate-600 uppercase mt-1">
             {personalInfo.jobTitle}
           </p>
         )}
-        <div className="flex flex-wrap justify-center items-center gap-x-3 text-xs font-sans text-slate-600 mt-2">
+        <div className="flex flex-wrap justify-center items-center gap-x-3 text-xs text-slate-600 mt-2">
           {personalInfo.location && <span>{personalInfo.location}</span>}
           {personalInfo.phone && <span>| {personalInfo.phone}</span>}
           {personalInfo.email && (
@@ -43,23 +51,23 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
       {/* Executive Summary */}
       {visibleSections.summary !== false && summary && (
         <section className="my-5 bg-slate-50 p-4 border-l-4" style={{ borderColor: theme.primaryColor }}>
-          <h2 className="text-xs font-sans font-bold uppercase tracking-wider text-slate-900 mb-1">
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 mb-1`}>
             Executive Profile & Leadership Scope
           </h2>
-          <p className="text-xs font-serif leading-relaxed text-slate-800 text-justify">{summary}</p>
+          <p className="leading-relaxed text-slate-800 text-justify">{summary}</p>
         </section>
       )}
 
       {/* Leadership Experience */}
       {visibleSections.experience !== false && experience && experience.length > 0 && (
         <section className="mb-5">
-          <h2 className="text-xs font-sans font-bold uppercase tracking-wider text-slate-900 border-b border-slate-400 pb-1 mb-3">
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b border-slate-400 pb-1 mb-3`}>
             Professional Experience & Career History
           </h2>
           <div className="space-y-4">
             {experience.map((exp) => (
               <div key={exp.id}>
-                <div className="flex justify-between items-baseline font-sans">
+                <div className="flex justify-between items-baseline">
                   <div>
                     <span className="font-bold text-slate-900 text-sm">{exp.role}</span>
                     <span className="text-slate-700">, {exp.company}</span>
@@ -70,10 +78,11 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
                   </span>
                 </div>
                 {exp.bullets && exp.bullets.length > 0 && (
-                  <ul className="mt-1.5 space-y-1 text-xs text-slate-800 font-serif">
+                  <ul className="mt-1.5 space-y-1 text-slate-800">
                     {exp.bullets.map((b, idx) => (
-                      <li key={idx} className="leading-relaxed pl-2 border-l border-slate-300">
-                        {b}
+                      <li key={idx} className="leading-relaxed pl-2 border-l border-slate-300 flex items-start gap-1.5">
+                        <span className="text-slate-500 font-bold shrink-0">{bulletIcon}</span>
+                        <span>{b}</span>
                       </li>
                     ))}
                   </ul>
@@ -87,10 +96,10 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
       {/* Core Competencies */}
       {visibleSections.skills !== false && (
         <section className="mb-5">
-          <h2 className="text-xs font-sans font-bold uppercase tracking-wider text-slate-900 border-b border-slate-400 pb-1 mb-2">
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b border-slate-400 pb-1 mb-2`}>
             Strategic Competencies & Board Focus
           </h2>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs font-sans">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
             {skills.technical && skills.technical.length > 0 && (
               <div>
                 <span className="font-bold text-slate-900 block mb-0.5">Enterprise & Strategy:</span>
@@ -116,10 +125,10 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
       {/* Education & Credentials */}
       {visibleSections.education !== false && education && education.length > 0 && (
         <section>
-          <h2 className="text-xs font-sans font-bold uppercase tracking-wider text-slate-900 border-b border-slate-400 pb-1 mb-2">
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b border-slate-400 pb-1 mb-2`}>
             Education & Executive Credentials
           </h2>
-          <div className="space-y-2 font-sans text-xs">
+          <div className="space-y-2 text-xs">
             {education.map((edu) => (
               <div key={edu.id} className="flex justify-between items-baseline">
                 <div>

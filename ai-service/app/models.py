@@ -121,3 +121,4 @@ class TailorResponse(BaseModel):
     missingKeywords: List[str]
     tailoredSummary: str
     recommendedChanges: List[str]
+

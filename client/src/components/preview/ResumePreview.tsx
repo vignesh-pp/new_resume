@@ -1,37 +1,63 @@
 import React, { useRef } from 'react';
 import { useResumeStore } from '../../store/useResumeStore';
 import { ResumeRenderer } from '../templates/ResumeRenderer';
-import { ZoomIn, ZoomOut, RotateCcw, Printer, Download, Sparkles } from 'lucide-react';
+import { TemplateStrip } from './TemplateStrip';
+import { 
+  ZoomIn, ZoomOut, RotateCcw, Printer, Download, Type, 
+  Eye, FileText, Maximize2 
+} from 'lucide-react';
 
 interface ResumePreviewProps {
   onPrint?: () => void;
   onDownloadPdf?: () => void;
   onDownloadDocx?: () => void;
+  onOpenFontModal?: () => void;
 }
 
 export const ResumePreview: React.FC<ResumePreviewProps> = ({
   onPrint,
   onDownloadPdf,
   onDownloadDocx,
+  onOpenFontModal,
 }) => {
-  const { resumeData, activeTemplate, theme, zoom, setZoom } = useResumeStore();
+  const { resumeData, activeTemplate, theme, zoom, setZoom, setTheme } = useResumeStore();
   const printRef = useRef<HTMLDivElement>(null);
 
   const handleZoomIn = () => setZoom(Math.min(1.4, zoom + 0.1));
   const handleZoomOut = () => setZoom(Math.max(0.6, zoom - 0.1));
   const handleZoomReset = () => setZoom(1.0);
+  const handleFitPage = () => setZoom(0.85);
 
   return (
-    <div className="flex flex-col h-full bg-slate-200/80 rounded-2xl overflow-hidden border border-slate-300/80 shadow-inner">
+    <div className="flex flex-col h-full bg-slate-200/90 rounded-2xl overflow-hidden border border-slate-300 shadow-inner">
+      {/* Visual Template Quick-Switcher Strip */}
+      <TemplateStrip />
+
       {/* Preview Top Control Bar */}
-      <div className="flex flex-wrap items-center justify-between px-4 py-2.5 bg-white border-b border-slate-200 gap-2 z-10">
+      <div className="flex flex-wrap items-center justify-between px-4 py-2 bg-white border-b border-slate-200 gap-2 z-10">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-            Live Preview
-          </span>
-          <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-            {activeTemplate.replace('-', ' ').toUpperCase()}
-          </span>
+          {onOpenFontModal && (
+            <button
+              onClick={onOpenFontModal}
+              className="px-2.5 py-1.5 rounded-lg border border-blue-200 bg-blue-50/80 text-blue-700 hover:bg-blue-100 transition-colors flex items-center gap-1.5 text-xs font-semibold"
+            >
+              <Type className="w-3.5 h-3.5" />
+              <span>Font: {theme.fontFamily}</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => setTheme({ showPageBreakGuide: !theme.showPageBreakGuide })}
+            className={`px-2 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors ${
+              theme.showPageBreakGuide
+                ? 'border-emerald-300 bg-emerald-50 text-emerald-800 font-semibold'
+                : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+            }`}
+            title="Toggle 1-page A4 cutoff guide"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">1-Page Line</span>
+          </button>
         </div>
 
         {/* Zoom & Action Controls */}
@@ -55,9 +81,16 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
               <ZoomIn className="w-3.5 h-3.5" />
             </button>
             <button
+              onClick={handleFitPage}
+              className="p-1 rounded text-slate-600 hover:text-slate-900 hover:bg-white text-[10px] font-semibold px-1"
+              title="Fit to Height"
+            >
+              Fit
+            </button>
+            <button
               onClick={handleZoomReset}
               className="p-1 rounded text-slate-600 hover:text-slate-900 hover:bg-white"
-              title="Reset Zoom"
+              title="Reset 100%"
             >
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
@@ -66,7 +99,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
           {onPrint && (
             <button
               onClick={onPrint}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-1 text-xs font-semibold"
+              className="p-1.5 px-2 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-1 text-xs font-semibold"
               title="Print Resume"
             >
               <Printer className="w-3.5 h-3.5" />
@@ -77,7 +110,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
           {onDownloadPdf && (
             <button
               onClick={onDownloadPdf}
-              className="p-1.5 px-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-1 text-xs font-semibold shadow-xs"
+              className="p-1.5 px-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-1.5 text-xs font-semibold shadow-xs"
               title="Download Vector PDF"
             >
               <Download className="w-3.5 h-3.5" />
@@ -108,8 +141,20 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
             transformOrigin: 'top center',
             transition: 'transform 0.15s ease-out',
           }}
-          className="w-full max-w-[800px] bg-white shadow-2xl rounded-sm print:transform-none print:shadow-none print:m-0 print:p-0"
+          className="relative w-full max-w-[800px] bg-white shadow-2xl rounded-sm print:transform-none print:shadow-none print:m-0 print:p-0"
         >
+          {/* Optional A4 1-Page Cutoff Guide Line */}
+          {theme.showPageBreakGuide && (
+            <div 
+              className="absolute left-0 right-0 border-b-2 border-dashed border-rose-400 z-20 pointer-events-none flex items-center justify-end pr-4"
+              style={{ top: '1050px' }}
+            >
+              <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+                ✂ 1-Page A4 Cutoff Boundary
+              </span>
+            </div>
+          )}
+
           <ResumeRenderer
             templateId={activeTemplate}
             resumeData={resumeData}

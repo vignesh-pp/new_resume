@@ -1,6 +1,7 @@
 import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
 import { Terminal, Github, Globe, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
 
 interface TemplateProps {
   resumeData: ResumeSchema;
@@ -10,23 +11,22 @@ interface TemplateProps {
 export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) => {
   const { personalInfo, summary, experience, education, skills, projects, certifications, visibleSections } = resumeData;
 
-  const fontClass = {
-    'Inter': 'font-sans',
-    'Roboto': 'font-sans',
-    'Merriweather': 'font-serif',
-    'JetBrains Mono': 'font-mono',
-    'Poppins': 'font-display',
-  }[theme.fontFamily] || 'font-sans';
+  const fontStyle = { fontFamily: getFontFamilyCss(theme.fontFamily) };
+  const sizeClasses = getFontSizeClasses(theme.fontSize);
+  const bulletIcon = getBulletIcon(theme.bulletStyle);
 
   return (
-    <div className={`w-full max-w-[800px] mx-auto bg-white text-slate-900 p-8 shadow-sm ${fontClass} text-sm print:p-0 print:shadow-none`}>
+    <div 
+      style={fontStyle}
+      className={`w-full max-w-[800px] mx-auto bg-white text-slate-900 p-8 shadow-sm ${sizeClasses.body} print:p-0 print:shadow-none`}
+    >
       {/* Terminal Style Header Bar */}
       <header className="border-b-2 pb-4 mb-4" style={{ borderColor: theme.primaryColor }}>
         <div className="flex justify-between items-center">
           <div>
             <div className="flex items-center gap-2">
               <Terminal className="w-5 h-5 text-teal-600" />
-              <h1 className="text-2xl font-bold tracking-tight text-slate-950 font-mono">
+              <h1 className={`${sizeClasses.h1} font-bold tracking-tight text-slate-950 font-mono`}>
                 {personalInfo.fullName}
               </h1>
             </div>
@@ -62,7 +62,7 @@ export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
       {/* Summary */}
       {visibleSections.summary !== false && summary && (
         <section className="mb-4">
-          <p className="text-xs text-slate-700 leading-relaxed">{summary}</p>
+          <p className="leading-relaxed text-slate-700">{summary}</p>
         </section>
       )}
 
@@ -112,18 +112,18 @@ export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
               <div key={exp.id}>
                 <div className="flex justify-between items-baseline">
                   <div>
-                    <span className="font-bold text-xs text-slate-900">{exp.role}</span>
-                    <span className="text-xs text-teal-700 font-medium"> @ {exp.company}</span>
+                    <span className="font-bold text-slate-900">{exp.role}</span>
+                    <span className="text-teal-700 font-medium"> @ {exp.company}</span>
                   </div>
                   <span className="text-[11px] font-mono text-slate-500">
                     {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
                   </span>
                 </div>
                 {exp.bullets && exp.bullets.length > 0 && (
-                  <ul className="mt-1 space-y-1 text-xs text-slate-700">
+                  <ul className="mt-1 space-y-1 text-slate-700">
                     {exp.bullets.map((b, idx) => (
                       <li key={idx} className="flex items-start gap-1.5 leading-relaxed">
-                        <span className="text-teal-600 font-mono text-[10px] mt-0.5">&gt;</span>
+                        <span className="text-teal-600 font-mono text-[10px] mt-0.5">{bulletIcon}</span>
                         <span>{b}</span>
                       </li>
                     ))}
@@ -145,7 +145,7 @@ export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
             {projects.map((proj) => (
               <div key={proj.id} className="border-l-2 border-teal-500 pl-3">
                 <div className="flex justify-between items-baseline">
-                  <span className="font-bold text-xs text-slate-900">{proj.name}</span>
+                  <span className="font-bold text-slate-900">{proj.name}</span>
                   {proj.github && (
                     <a href={proj.github} target="_blank" rel="noreferrer" className="text-[11px] font-mono text-teal-700 underline">
                       github_repo ↗
@@ -157,7 +157,7 @@ export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
                     Stack: {proj.technologies.join(' / ')}
                   </p>
                 )}
-                {proj.description && <p className="text-xs text-slate-700 mt-0.5">{proj.description}</p>}
+                {proj.description && <p className="text-slate-700 mt-0.5">{proj.description}</p>}
               </div>
             ))}
           </div>

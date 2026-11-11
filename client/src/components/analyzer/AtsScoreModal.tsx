@@ -193,3 +193,4 @@ export const AtsScoreModal: React.FC<AtsScoreModalProps> = ({ isOpen, onClose })
     </div>
   );
 };
+

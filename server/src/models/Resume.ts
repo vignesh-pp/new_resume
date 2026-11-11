@@ -56,3 +56,4 @@ const ResumeSchema: Schema = new Schema(
 );
 
 export const Resume = mongoose.model<IResume>('Resume', ResumeSchema);
+

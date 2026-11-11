@@ -212,3 +212,4 @@ def generate_resume_docx(resume: ResumeSchema, template_id: str = "classic-ats")
     out = io.BytesIO()
     doc.save(out)
     return out.getvalue()
+

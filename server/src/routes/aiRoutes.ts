@@ -16,3 +16,4 @@ router.post('/tailor-resume', aiController.tailorResume);
 router.post('/export-docx', aiController.exportDocx);
 
 export default router;
+

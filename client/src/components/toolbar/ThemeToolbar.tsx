@@ -1,18 +1,22 @@
 import React from 'react';
 import { useResumeStore } from '../../store/useResumeStore';
 import { TEMPLATES_CONFIG } from '../../utils/templateDefinitions';
-import { Palette, Type, LayoutTemplate, Sparkles, Upload } from 'lucide-react';
+import { Palette, Type, LayoutTemplate, Sparkles, Upload, FolderOpen } from 'lucide-react';
 
 interface ThemeToolbarProps {
   onUploadClick: () => void;
   onAnalyzeClick: () => void;
   onTailorClick: () => void;
+  onOpenFontModal: () => void;
+  onOpenVersionsModal: () => void;
 }
 
 export const ThemeToolbar: React.FC<ThemeToolbarProps> = ({
   onUploadClick,
   onAnalyzeClick,
   onTailorClick,
+  onOpenFontModal,
+  onOpenVersionsModal,
 }) => {
   const {
     activeTemplate,
@@ -26,24 +30,17 @@ export const ThemeToolbar: React.FC<ThemeToolbarProps> = ({
   const colorPresets = [
     { name: 'Corporate Blue', hex: '#1e3a8a' },
     { name: 'Modern Sky', hex: '#0284c7' },
-    { name: 'Emerald', hex: '#059669' },
+    { name: 'Emerald Growth', hex: '#059669' },
     { name: 'Executive Slate', hex: '#0f172a' },
     { name: 'Creative Violet', hex: '#7c3aed' },
-    { name: 'Crimson', hex: '#dc2626' },
+    { name: 'Crimson Power', hex: '#dc2626' },
     { name: 'Teal Tech', hex: '#0d9488' },
-  ];
-
-  const fonts: Array<'Inter' | 'Roboto' | 'Merriweather' | 'JetBrains Mono' | 'Poppins'> = [
-    'Inter',
-    'Roboto',
-    'Merriweather',
-    'JetBrains Mono',
-    'Poppins',
+    { name: 'Amber Gold', hex: '#d97706' },
   ];
 
   return (
     <div className="bg-white border-b border-slate-200 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-xs">
-      {/* Left: Template Selector & Sample Presets */}
+      {/* Left: Template & Presets */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-1.5 text-xs text-slate-700">
           <LayoutTemplate className="w-3.5 h-3.5 text-slate-500" />
@@ -86,9 +83,20 @@ export const ThemeToolbar: React.FC<ThemeToolbarProps> = ({
         </div>
       </div>
 
-      {/* Middle: Color Swatches & Typography */}
+      {/* Middle: Font Selector Pill & Color Swatches */}
       <div className="flex flex-wrap items-center gap-3">
-        {/* Colors */}
+        {/* Font Picker Button */}
+        <button
+          onClick={onOpenFontModal}
+          className="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-2xs"
+          title="Choose from 10 font styles and adjust formatting"
+        >
+          <Type className="w-3.5 h-3.5 text-blue-600" />
+          <span>Font: <strong className="font-bold text-slate-900">{theme.fontFamily}</strong></span>
+          <span className="text-[10px] bg-blue-100 text-blue-700 px-1 rounded font-normal">Change</span>
+        </button>
+
+        {/* Colors Swatches */}
         <div className="flex items-center gap-1.5">
           <Palette className="w-3.5 h-3.5 text-slate-500" />
           <div className="flex items-center gap-1">
@@ -108,28 +116,12 @@ export const ThemeToolbar: React.FC<ThemeToolbarProps> = ({
               value={theme.primaryColor}
               onChange={(e) => setTheme({ primaryColor: e.target.value })}
               className="w-4 h-4 rounded cursor-pointer border-0 bg-transparent p-0"
-              title="Custom Color"
+              title="Custom Hex Color"
             />
           </div>
         </div>
 
-        {/* Fonts */}
-        <div className="flex items-center gap-1.5 text-xs text-slate-700">
-          <Type className="w-3.5 h-3.5 text-slate-500" />
-          <select
-            value={theme.fontFamily}
-            onChange={(e) => setTheme({ fontFamily: e.target.value as any })}
-            className="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none"
-          >
-            {fonts.map((f) => (
-              <option key={f} value={f}>
-                {f}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Spacing */}
+        {/* Spacing density pill */}
         <div className="flex items-center bg-slate-100 rounded-lg p-0.5 text-[11px]">
           {(['compact', 'normal', 'spacious'] as const).map((sp) => (
             <button
@@ -145,14 +137,23 @@ export const ThemeToolbar: React.FC<ThemeToolbarProps> = ({
         </div>
       </div>
 
-      {/* Right: AI Tools & Upload */}
+      {/* Right: AI Tools & Version Manager */}
       <div className="flex items-center gap-2">
+        <button
+          onClick={onOpenVersionsModal}
+          className="px-2.5 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 shadow-xs"
+          title="Saved resume versions in MongoDB"
+        >
+          <FolderOpen className="w-3.5 h-3.5 text-slate-500" />
+          <span>Versions</span>
+        </button>
+
         <button
           onClick={onUploadClick}
           className="px-2.5 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 shadow-xs"
         >
           <Upload className="w-3.5 h-3.5 text-slate-500" />
-          <span>Upload PDF/DOCX</span>
+          <span>Upload</span>
         </button>
 
         <button
@@ -161,7 +162,7 @@ export const ThemeToolbar: React.FC<ThemeToolbarProps> = ({
           className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 flex items-center gap-1.5 shadow-xs transition-colors"
         >
           <Sparkles className="w-3.5 h-3.5" />
-          <span>{isAnalyzing ? 'Analyzing...' : 'ATS Score'}</span>
+          <span>{isAnalyzing ? 'Scoring...' : 'ATS Check'}</span>
         </button>
 
         <button
@@ -169,7 +170,7 @@ export const ThemeToolbar: React.FC<ThemeToolbarProps> = ({
           className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-1.5 shadow-xs transition-colors"
         >
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Tailor for Job</span>
+          <span>Tailor</span>
         </button>
       </div>
     </div>

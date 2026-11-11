@@ -9,6 +9,8 @@ import { AtsScoreModal } from './components/analyzer/AtsScoreModal';
 import { BulletEnhancerModal } from './components/ai-tools/BulletEnhancerModal';
 import { JobTailorModal } from './components/ai-tools/JobTailorModal';
 import { UploadModal } from './components/upload/UploadModal';
+import { FontPickerModal } from './components/toolbar/FontPickerModal';
+import { ResumeVersionsModal } from './components/versions/ResumeVersionsModal';
 import { exportUtils } from './utils/exportUtils';
 import axios from 'axios';
 
@@ -24,6 +26,8 @@ export function App() {
 
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isAtsModalOpen, setIsAtsModalOpen] = useState(false);
+  const [isFontModalOpen, setIsFontModalOpen] = useState(false);
+  const [isVersionsModalOpen, setIsVersionsModalOpen] = useState(false);
 
   // Trigger ATS analysis
   const runAtsAnalysis = async () => {
@@ -102,6 +106,8 @@ export function App() {
               setIsAtsModalOpen(true);
             }}
             onTailorClick={() => setShowTailorModal(true)}
+            onOpenFontModal={() => setIsFontModalOpen(true)}
+            onOpenVersionsModal={() => setIsVersionsModalOpen(true)}
           />
 
           {/* Split Pane: Left Editor | Right Live Preview */}
@@ -117,6 +123,7 @@ export function App() {
                 onPrint={handlePrint}
                 onDownloadPdf={handleDownloadPdf}
                 onDownloadDocx={handleDownloadDocx}
+                onOpenFontModal={() => setIsFontModalOpen(true)}
               />
             </div>
           </div>
@@ -133,6 +140,16 @@ export function App() {
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
         onAnalysisTrigger={runAtsAnalysis}
+      />
+
+      <FontPickerModal
+        isOpen={isFontModalOpen}
+        onClose={() => setIsFontModalOpen(false)}
+      />
+
+      <ResumeVersionsModal
+        isOpen={isVersionsModalOpen}
+        onClose={() => setIsVersionsModalOpen(false)}
       />
 
       <BulletEnhancerModal />

@@ -38,3 +38,4 @@ export const ResumeRenderer: React.FC<ResumeRendererProps> = ({
       return <ClassicAtsTemplate resumeData={resumeData} theme={theme} />;
   }
 };
+

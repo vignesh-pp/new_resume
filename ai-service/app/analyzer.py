@@ -241,3 +241,4 @@ def tailor_resume_to_job(resume: ResumeSchema, job_description: str) -> TailorRe
         tailoredSummary=tailored_summary,
         recommendedChanges=recommendations
     )
+

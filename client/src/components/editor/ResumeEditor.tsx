@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useResumeStore } from '../../store/useResumeStore';
 import { 
   User, Briefcase, GraduationCap, Wrench, FolderGit2, Award, 
-  ChevronDown, ChevronUp, Plus, Trash2, Sparkles, Eye, EyeOff
+  ChevronDown, ChevronUp, Plus, Trash2, Sparkles, Eye, EyeOff, 
+  ArrowUp, ArrowDown, Wand2, Tag 
 } from 'lucide-react';
+import axios from 'axios';
 
 export const ResumeEditor: React.FC = () => {
   const {
@@ -29,6 +31,7 @@ export const ResumeEditor: React.FC = () => {
   } = useResumeStore();
 
   const [expandedSection, setExpandedSection] = useState<string>('personal');
+  const [generatingSummary, setGeneratingSummary] = useState(false);
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? '' : section);
@@ -39,6 +42,52 @@ export const ResumeEditor: React.FC = () => {
   const handleAiBulletClick = (expId: string, bulletIndex: number, text: string) => {
     setActiveBulletContext({ expId, bulletIndex, text });
     setShowBulletModal(true);
+  };
+
+  const handleGenerateSummary = async () => {
+    setGeneratingSummary(true);
+    try {
+      const topRole = experience[0]?.role || personalInfo.jobTitle || 'Software Engineer';
+      const company = experience[0]?.company || 'leading tech companies';
+      const techSkills = [...(skills.languages || []), ...(skills.frameworks || [])].slice(0, 4).join(', ');
+
+      const draft = `Accomplished and results-driven ${topRole} with extensive experience architecting scalable systems and delivering high-impact solutions at ${company}. Proven track record in ${techSkills || 'full-stack engineering, cloud architecture, and modern agile delivery'}. Adept at leading cross-functional teams, optimizing system performance, and driving measurable business results.`;
+      
+      updateSummary(draft);
+    } finally {
+      setTimeout(() => setGeneratingSummary(false), 300);
+    }
+  };
+
+  const handleAddSkillPill = (skillName: string, category: 'languages' | 'frameworks' | 'tools' | 'softSkills') => {
+    const currentList = skills[category] || [];
+    if (!currentList.includes(skillName)) {
+      updateSkills({ [category]: [...currentList, skillName] });
+    }
+  };
+
+  const moveExperience = (index: number, direction: 'up' | 'down') => {
+    const newExp = [...experience];
+    const targetIdx = direction === 'up' ? index - 1 : index + 1;
+    if (targetIdx < 0 || targetIdx >= newExp.length) return;
+    const temp = newExp[index];
+    newExp[index] = newExp[targetIdx];
+    newExp[targetIdx] = temp;
+    useResumeStore.setState((state) => ({
+      resumeData: { ...state.resumeData, experience: newExp }
+    }));
+  };
+
+  const moveProject = (index: number, direction: 'up' | 'down') => {
+    const newProj = [...projects];
+    const targetIdx = direction === 'up' ? index - 1 : index + 1;
+    if (targetIdx < 0 || targetIdx >= newProj.length) return;
+    const temp = newProj[index];
+    newProj[index] = newProj[targetIdx];
+    newProj[targetIdx] = temp;
+    useResumeStore.setState((state) => ({
+      resumeData: { ...state.resumeData, projects: newProj }
+    }));
   };
 
   return (
@@ -179,7 +228,21 @@ export const ResumeEditor: React.FC = () => {
         </button>
 
         {expandedSection === 'summary' && (
-          <div className="p-4 sm:px-6 pt-0 border-t border-slate-100">
+          <div className="p-4 sm:px-6 pt-0 border-t border-slate-100 space-y-2.5">
+            <div className="flex justify-between items-center">
+              <span className="text-[11px] text-slate-500 font-medium">
+                Keep it concise (2-4 sentences) highlighting impact and top skills.
+              </span>
+              <button
+                type="button"
+                onClick={handleGenerateSummary}
+                disabled={generatingSummary}
+                className="text-xs font-semibold text-emerald-600 hover:text-emerald-800 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors"
+              >
+                <Wand2 className="w-3.5 h-3.5" />
+                <span>{generatingSummary ? 'Drafting...' : '✨ AI Generate Summary'}</span>
+              </button>
+            </div>
             <textarea
               rows={4}
               value={summary}
@@ -216,7 +279,29 @@ export const ResumeEditor: React.FC = () => {
             {experience.map((exp, expIdx) => (
               <div key={exp.id} className="p-4 rounded-xl bg-slate-50/70 border border-slate-200/80 space-y-3 relative group">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-bold text-slate-700">Position #{expIdx + 1}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-700">Position #{expIdx + 1}</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => moveExperience(expIdx, 'up')}
+                        disabled={expIdx === 0}
+                        className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"
+                        title="Move Up"
+                      >
+                        <ArrowUp className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveExperience(expIdx, 'down')}
+                        disabled={expIdx === experience.length - 1}
+                        className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30"
+                        title="Move Down"
+                      >
+                        <ArrowDown className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
                   <button
                     onClick={() => removeExperience(exp.id)}
                     className="text-red-500 hover:text-red-700 p-1 rounded-lg text-xs flex items-center gap-1"
@@ -276,7 +361,7 @@ export const ResumeEditor: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        const newBullets = [...exp.bullets, 'Delivered new feature that increased user retention by 20%.'];
+                        const newBullets = [...exp.bullets, 'Accomplished key milestones that boosted team throughput by 25%.'];
                         updateExperience(exp.id, { bullets: newBullets });
                       }}
                       className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
@@ -335,7 +420,7 @@ export const ResumeEditor: React.FC = () => {
         )}
       </div>
 
-      {/* 4. Skills & Competencies */}
+      {/* 4. Skills & Competencies with Skill Bank Pill Suggestions */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <button
           onClick={() => toggleSection('skills')}
@@ -354,7 +439,40 @@ export const ResumeEditor: React.FC = () => {
         </button>
 
         {expandedSection === 'skills' && (
-          <div className="p-4 sm:px-6 pt-0 border-t border-slate-100 space-y-3">
+          <div className="p-4 sm:px-6 pt-0 border-t border-slate-100 space-y-4">
+            {/* Quick Skill Bank Pills */}
+            <div className="p-3 bg-amber-50/50 rounded-xl border border-amber-100">
+              <span className="text-[11px] font-bold text-amber-900 block mb-1.5 flex items-center gap-1">
+                <Tag className="w-3 h-3" /> Quick Add Popular ATS Skills:
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { name: 'TypeScript', cat: 'languages' },
+                  { name: 'Python', cat: 'languages' },
+                  { name: 'React', cat: 'frameworks' },
+                  { name: 'Node.js', cat: 'frameworks' },
+                  { name: 'Next.js', cat: 'frameworks' },
+                  { name: 'FastAPI', cat: 'frameworks' },
+                  { name: 'Docker', cat: 'tools' },
+                  { name: 'Kubernetes', cat: 'tools' },
+                  { name: 'AWS', cat: 'tools' },
+                  { name: 'PostgreSQL', cat: 'tools' },
+                  { name: 'Redis', cat: 'tools' },
+                  { name: 'Microservices', cat: 'softSkills' },
+                  { name: 'System Design', cat: 'softSkills' },
+                ].map((s) => (
+                  <button
+                    key={s.name}
+                    type="button"
+                    onClick={() => handleAddSkillPill(s.name, s.cat as any)}
+                    className="px-2 py-0.5 rounded-md bg-white border border-amber-200 text-amber-900 hover:bg-amber-100 text-[11px] font-medium transition-colors"
+                  >
+                    + {s.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Programming Languages (comma-separated)
@@ -455,16 +573,38 @@ export const ResumeEditor: React.FC = () => {
 
         {expandedSection === 'projects' && (
           <div className="p-4 sm:px-6 pt-0 border-t border-slate-100 space-y-4">
-            {projects.map((proj) => (
+            {projects.map((proj, projIdx) => (
               <div key={proj.id} className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200 space-y-2.5">
                 <div className="flex justify-between items-center">
-                  <input
-                    type="text"
-                    value={proj.name}
-                    onChange={(e) => updateProject(proj.id, { name: e.target.value })}
-                    className="font-bold text-xs text-slate-900 bg-transparent border-b border-dashed border-slate-300 focus:outline-none focus:border-teal-500 w-2/3"
-                    placeholder="Project Name"
-                  />
+                  <div className="flex items-center gap-2 w-2/3">
+                    <input
+                      type="text"
+                      value={proj.name}
+                      onChange={(e) => updateProject(proj.id, { name: e.target.value })}
+                      className="font-bold text-xs text-slate-900 bg-transparent border-b border-dashed border-slate-300 focus:outline-none focus:border-teal-500 w-full"
+                      placeholder="Project Name"
+                    />
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => moveProject(projIdx, 'up')}
+                        disabled={projIdx === 0}
+                        className="p-0.5 text-slate-400 hover:text-slate-700 disabled:opacity-30"
+                        title="Move Up"
+                      >
+                        <ArrowUp className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveProject(projIdx, 'down')}
+                        disabled={projIdx === projects.length - 1}
+                        className="p-0.5 text-slate-400 hover:text-slate-700 disabled:opacity-30"
+                        title="Move Down"
+                      >
+                        <ArrowDown className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
                   <button
                     onClick={() => removeProject(proj.id)}
                     className="text-red-500 hover:text-red-700 p-1 rounded text-xs flex items-center gap-1"
