@@ -2,6 +2,8 @@ import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
 import { Mail, Phone, MapPin, Globe, Linkedin, Github } from 'lucide-react';
 import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
+import { DraggableSection } from '../preview/DraggableSection';
+import { getSectionTitle } from '../../utils/sectionTitles';
 
 interface TemplateProps {
   resumeData: ResumeSchema;
@@ -89,66 +91,72 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
 
         {/* Skills & Tools in Sidebar */}
         {visibleSections.skills !== false && (
-          <div className="space-y-2 text-xs">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-700 pb-0.5 mb-1">
-              Design & Tech Stack
-            </h3>
-            {skills.tools && skills.tools.length > 0 && (
-              <div>
-                <span className="text-[10px] font-semibold text-slate-300 block mb-1">Key Tools:</span>
-                <div className="flex flex-wrap gap-1">
-                  {skills.tools.map((t, idx) => (
-                    <span key={idx} className="bg-slate-800 text-slate-200 text-[10px] px-1.5 py-0.5 rounded">
-                      {t}
-                    </span>
-                  ))}
+          <DraggableSection sectionId="skills" customLabel={getSectionTitle(resumeData, 'skills', 'Tech Stack')}>
+            <div className="space-y-2 text-xs">
+              <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-700 pb-0.5 mb-1">
+                {getSectionTitle(resumeData, 'skills', 'Design & Tech Stack')}
+              </h3>
+              {skills.tools && skills.tools.length > 0 && (
+                <div>
+                  <span className="text-[10px] font-semibold text-slate-300 block mb-1">Key Tools:</span>
+                  <div className="flex flex-wrap gap-1">
+                    {skills.tools.map((t, idx) => (
+                      <span key={idx} className="bg-slate-800 text-slate-200 text-[10px] px-1.5 py-0.5 rounded">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-            {skills.technical && skills.technical.length > 0 && (
-              <div>
-                <span className="text-[10px] font-semibold text-slate-300 block mb-1">Core Expertise:</span>
-                <div className="flex flex-wrap gap-1">
-                  {skills.technical.map((tech, idx) => (
-                    <span key={idx} className="bg-slate-800 text-slate-200 text-[10px] px-1.5 py-0.5 rounded">
-                      {tech}
-                    </span>
-                  ))}
+              )}
+              {skills.technical && skills.technical.length > 0 && (
+                <div>
+                  <span className="text-[10px] font-semibold text-slate-300 block mb-1">Core Expertise:</span>
+                  <div className="flex flex-wrap gap-1">
+                    {skills.technical.map((tech, idx) => (
+                      <span key={idx} className="bg-slate-800 text-slate-200 text-[10px] px-1.5 py-0.5 rounded">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </DraggableSection>
         )}
 
         {/* Education in Sidebar */}
         {visibleSections.education !== false && education && education.length > 0 && (
-          <div className="space-y-2 text-xs">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-700 pb-0.5 mb-1">
-              Education
-            </h3>
-            {education.map((edu) => (
-              <div key={edu.id} className="text-slate-300">
-                <p className="font-semibold text-white leading-tight">{edu.degree}</p>
-                <p className="text-[11px] text-slate-400">{edu.fieldOfStudy}</p>
-                <p className="text-[10px] text-slate-500 whitespace-nowrap">{edu.institution} ({edu.startDate} – {edu.endDate})</p>
-              </div>
-            ))}
-          </div>
+          <DraggableSection sectionId="education" customLabel={getSectionTitle(resumeData, 'education', 'Education')}>
+            <div className="space-y-2 text-xs">
+              <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-700 pb-0.5 mb-1">
+                {getSectionTitle(resumeData, 'education', 'Education')}
+              </h3>
+              {education.map((edu) => (
+                <div key={edu.id} className="text-slate-300">
+                  <p className="font-semibold text-white leading-tight">{edu.degree}</p>
+                  <p className="text-[11px] text-slate-400">{edu.fieldOfStudy}</p>
+                  <p className="text-[10px] text-slate-500 whitespace-nowrap">{edu.institution} ({edu.startDate} – {edu.endDate})</p>
+                </div>
+              ))}
+            </div>
+          </DraggableSection>
         )}
 
         {/* Certifications in Sidebar */}
         {visibleSections.certifications !== false && certifications && certifications.length > 0 && (
-          <div className="space-y-1.5 text-xs">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-700 pb-0.5 mb-1">
-              Credentials
-            </h3>
-            {certifications.map((c) => (
-              <div key={c.id} className="text-slate-300 text-[11px]">
-                <p className="font-medium text-white leading-tight">{c.name}</p>
-                <p className="text-slate-400 text-[10px]">{c.issuer} <span className="whitespace-nowrap">({c.date})</span></p>
-              </div>
-            ))}
-          </div>
+          <DraggableSection sectionId="certifications" customLabel={getSectionTitle(resumeData, 'certifications', 'Credentials')}>
+            <div className="space-y-1.5 text-xs">
+              <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-700 pb-0.5 mb-1">
+                {getSectionTitle(resumeData, 'certifications', 'Credentials')}
+              </h3>
+              {certifications.map((c) => (
+                <div key={c.id} className="text-slate-300 text-[11px]">
+                  <p className="font-medium text-white leading-tight">{c.name}</p>
+                  <p className="text-slate-400 text-[10px]">{c.issuer} <span className="whitespace-nowrap">({c.date})</span></p>
+                </div>
+              ))}
+            </div>
+          </DraggableSection>
         )}
       </aside>
 
@@ -156,93 +164,101 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
       <main className={`w-full sm:w-[65%] ${isSinglePageFit ? 'p-5 sm:p-6 gap-4' : 'p-6 sm:p-8 gap-5'} flex flex-col text-slate-800`}>
         {/* Profile Summary */}
         {visibleSections.summary !== false && summary && (
-          <section className="resume-section break-inside-avoid print:break-inside-avoid">
-            <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-0.5 mb-1.5 leading-snug`} style={{ borderColor: theme.primaryColor }}>
-              Profile
-            </h2>
-            <p className="leading-relaxed text-slate-600 text-justify">{summary}</p>
-          </section>
+          <DraggableSection sectionId="summary" customLabel={getSectionTitle(resumeData, 'summary', 'Profile')}>
+            <section className="resume-section break-inside-avoid print:break-inside-avoid">
+              <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-0.5 mb-1.5 leading-snug`} style={{ borderColor: theme.primaryColor }}>
+                {getSectionTitle(resumeData, 'summary', 'Profile')}
+              </h2>
+              <p className="leading-relaxed text-slate-600 text-justify">{summary}</p>
+            </section>
+          </DraggableSection>
         )}
 
         {/* Work Experience */}
         {visibleSections.experience !== false && experience && experience.length > 0 && (
-          <section className="resume-section">
-            <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-0.5 mb-2 leading-snug`} style={{ borderColor: theme.primaryColor }}>
-              Experience
-            </h2>
-            <div className={isSinglePageFit ? 'space-y-2.5' : 'space-y-3.5'}>
-              {experience.map((exp) => (
-                <div key={exp.id} className="resume-item break-inside-avoid print:break-inside-avoid">
-                  <div className="flex justify-between items-baseline gap-2">
-                    <h3 className="text-xs font-bold text-slate-900 flex-1 min-w-0">{exp.role}</h3>
-                    <span className="text-[11px] text-slate-500 font-medium shrink-0 ml-2 whitespace-nowrap text-right">
-                      {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
-                    </span>
+          <DraggableSection sectionId="experience" customLabel={getSectionTitle(resumeData, 'experience', 'Experience')}>
+            <section className="resume-section">
+              <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-0.5 mb-2 leading-snug`} style={{ borderColor: theme.primaryColor }}>
+                {getSectionTitle(resumeData, 'experience', 'Experience')}
+              </h2>
+              <div className={isSinglePageFit ? 'space-y-2.5' : 'space-y-3.5'}>
+                {experience.map((exp) => (
+                  <div key={exp.id} className="resume-item break-inside-avoid print:break-inside-avoid">
+                    <div className="flex justify-between items-baseline gap-2">
+                      <h3 className="text-xs font-bold text-slate-900 flex-1 min-w-0">{exp.role}</h3>
+                      <span className="text-[11px] text-slate-500 font-medium shrink-0 ml-2 whitespace-nowrap text-right">
+                        {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
+                      </span>
+                    </div>
+                    <p className="text-xs font-semibold mb-1" style={{ color: theme.primaryColor }}>
+                      {exp.company} {exp.location && <span className="text-slate-400 font-normal">({exp.location})</span>}
+                    </p>
+                    {exp.bullets && exp.bullets.length > 0 && (
+                      <ul className="space-y-0.5 text-slate-600">
+                        {exp.bullets.map((b, idx) => (
+                          <li key={idx} className="flex items-start gap-1.5 leading-relaxed">
+                            <span className="text-slate-400 font-bold shrink-0 mt-0.5">{bulletIcon}</span>
+                            <span>{b}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
-                  <p className="text-xs font-semibold mb-1" style={{ color: theme.primaryColor }}>
-                    {exp.company} {exp.location && <span className="text-slate-400 font-normal">({exp.location})</span>}
-                  </p>
-                  {exp.bullets && exp.bullets.length > 0 && (
-                    <ul className="space-y-0.5 text-slate-600">
-                      {exp.bullets.map((b, idx) => (
-                        <li key={idx} className="flex items-start gap-1.5 leading-relaxed">
-                          <span className="text-slate-400 font-bold shrink-0 mt-0.5">{bulletIcon}</span>
-                          <span>{b}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            </section>
+          </DraggableSection>
         )}
 
         {/* Featured Projects */}
         {visibleSections.projects !== false && projects && projects.length > 0 && (
-          <section className="resume-section">
-            <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-0.5 mb-2 leading-snug`} style={{ borderColor: theme.primaryColor }}>
-              Featured Case Studies & Work
-            </h2>
-            <div className={isSinglePageFit ? 'space-y-2' : 'space-y-2.5'}>
-              {projects.map((p) => (
-                <div key={p.id} className="resume-item break-inside-avoid print:break-inside-avoid p-2.5 bg-slate-50 rounded-lg border border-slate-100">
-                  <div className="flex justify-between items-baseline gap-2">
-                    <h3 className="text-xs font-bold text-slate-900 flex-1 min-w-0">{p.name}</h3>
-                    {p.url && (
-                      <a href={p.url} target="_blank" rel="noreferrer" className="text-xs font-medium hover:underline shrink-0 ml-2 whitespace-nowrap" style={{ color: theme.primaryColor }}>
-                        Live Link ↗
-                      </a>
-                    )}
+          <DraggableSection sectionId="projects" customLabel={getSectionTitle(resumeData, 'projects', 'Case Studies')}>
+            <section className="resume-section">
+              <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-0.5 mb-2 leading-snug`} style={{ borderColor: theme.primaryColor }}>
+                {getSectionTitle(resumeData, 'projects', 'Featured Case Studies & Work')}
+              </h2>
+              <div className={isSinglePageFit ? 'space-y-2' : 'space-y-2.5'}>
+                {projects.map((p) => (
+                  <div key={p.id} className="resume-item break-inside-avoid print:break-inside-avoid p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                    <div className="flex justify-between items-baseline gap-2">
+                      <h3 className="text-xs font-bold text-slate-900 flex-1 min-w-0">{p.name}</h3>
+                      {p.url && (
+                        <a href={p.url} target="_blank" rel="noreferrer" className="text-xs font-medium hover:underline shrink-0 ml-2 whitespace-nowrap" style={{ color: theme.primaryColor }}>
+                          Live Link ↗
+                        </a>
+                      )}
+                    </div>
+                    {p.description && <p className="text-slate-600 mt-1 text-xs">{p.description}</p>}
                   </div>
-                  {p.description && <p className="text-slate-600 mt-1 text-xs">{p.description}</p>}
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            </section>
+          </DraggableSection>
         )}
 
         {/* Custom Sections */}
         {(resumeData.customSections || []).map((sec) => {
           if (visibleSections[sec.id] === false || !sec.items?.length) return null;
           return (
-            <section key={sec.id} className="resume-section">
-              <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-0.5 mb-2 leading-snug`} style={{ borderColor: theme.primaryColor }}>
-                {sec.title}
-              </h2>
-              <div className="space-y-2">
-                {sec.items.map((it, idx) => (
-                  <div key={idx} className="resume-item break-inside-avoid print:break-inside-avoid p-2.5 bg-slate-50 rounded-lg border border-slate-100">
-                    <div className="flex justify-between items-baseline gap-2">
-                      <h3 className="text-xs font-bold text-slate-900 flex-1 min-w-0">{it.title}</h3>
-                      {it.date && <span className="text-[11px] font-medium text-slate-500 shrink-0 ml-2 whitespace-nowrap text-right">{it.date}</span>}
+            <DraggableSection key={sec.id} sectionId={sec.id} customLabel={sec.title}>
+              <section className="resume-section">
+                <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-0.5 mb-2 leading-snug`} style={{ borderColor: theme.primaryColor }}>
+                  {sec.title}
+                </h2>
+                <div className="space-y-2">
+                  {sec.items.map((it, idx) => (
+                    <div key={idx} className="resume-item break-inside-avoid print:break-inside-avoid p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                      <div className="flex justify-between items-baseline gap-2">
+                        <h3 className="text-xs font-bold text-slate-900 flex-1 min-w-0">{it.title}</h3>
+                        {it.date && <span className="text-[11px] font-medium text-slate-500 shrink-0 ml-2 whitespace-nowrap text-right">{it.date}</span>}
+                      </div>
+                      {it.subtitle && <p className="text-xs font-semibold" style={{ color: theme.primaryColor }}>{it.subtitle}</p>}
+                      {it.description && <p className="text-slate-600 mt-1 text-xs leading-relaxed">{it.description}</p>}
                     </div>
-                    {it.subtitle && <p className="text-xs font-semibold" style={{ color: theme.primaryColor }}>{it.subtitle}</p>}
-                    {it.description && <p className="text-slate-600 mt-1 text-xs leading-relaxed">{it.description}</p>}
-                  </div>
-                ))}
-              </div>
-            </section>
+                  ))}
+                </div>
+              </section>
+            </DraggableSection>
           );
         })}
       </main>

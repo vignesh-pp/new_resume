@@ -9,13 +9,13 @@ interface FontPickerModalProps {
   onClose: () => void;
 }
 
+const categories = ['All', 'Modern Sans', 'Classic Serif', 'Tech Monospace', 'Editorial Display'];
+
 export const FontPickerModal: React.FC<FontPickerModalProps> = ({ isOpen, onClose }) => {
   const { theme, setTheme } = useResumeStore();
+  const [selectedCat, setSelectedCat] = React.useState('All');
 
   if (!isOpen) return null;
-
-  const categories = ['All', 'Modern Sans', 'Classic Serif', 'Tech Monospace', 'Editorial Display'];
-  const [selectedCat, setSelectedCat] = React.useState('All');
 
   const filteredFonts = selectedCat === 'All'
     ? AVAILABLE_FONTS

@@ -28,6 +28,7 @@ export const LayoutManagerModal: React.FC<LayoutManagerModalProps> = ({ isOpen, 
     moveSectionOrder,
     toggleSectionVisibility,
     setSectionColumn,
+    updateSectionTitle,
   } = useResumeStore();
 
   if (!isOpen) return null;
@@ -147,7 +148,7 @@ export const LayoutManagerModal: React.FC<LayoutManagerModalProps> = ({ isOpen, 
             <div className="space-y-2">
               {currentOrder.map((sectionKey, idx) => {
                 const customSec = (resumeData.customSections || []).find((s) => s.id === sectionKey);
-                const label = SECTION_LABELS[sectionKey] || customSec?.title || sectionKey;
+                const currentTitle = resumeData.sectionTitles?.[sectionKey] ?? (SECTION_LABELS[sectionKey] || customSec?.title || sectionKey);
                 const isVisible = visibleSections[sectionKey] !== false;
                 const inLeftCol = leftSections.includes(sectionKey);
 
@@ -156,13 +157,21 @@ export const LayoutManagerModal: React.FC<LayoutManagerModalProps> = ({ isOpen, 
                     key={sectionKey}
                     className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white transition-colors flex items-center justify-between gap-3"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold shadow-2xs">
+                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                      <span className="w-6 h-6 shrink-0 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold shadow-2xs">
                         {idx + 1}
                       </span>
-                      <span className={`text-xs font-bold ${isVisible ? 'text-slate-900' : 'text-slate-400 line-through'}`}>
-                        {label}
-                      </span>
+                      <input
+                        type="text"
+                        value={currentTitle}
+                        onChange={(e) => updateSectionTitle(sectionKey, e.target.value)}
+                        disabled={!isVisible}
+                        placeholder={SECTION_LABELS[sectionKey] || sectionKey}
+                        className={`text-xs font-bold bg-transparent border border-transparent hover:border-slate-300 focus:border-indigo-500 focus:bg-white focus:outline-none px-2 py-1 rounded-lg transition-all flex-1 min-w-0 ${
+                          isVisible ? 'text-slate-900' : 'text-slate-400 line-through'
+                        }`}
+                        title="Click to edit section heading"
+                      />
                     </div>
 
                     <div className="flex items-center gap-1.5">

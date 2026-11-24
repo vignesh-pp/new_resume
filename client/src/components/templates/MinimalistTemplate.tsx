@@ -1,6 +1,8 @@
 import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
 import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
+import { DraggableSection } from '../preview/DraggableSection';
+import { getSectionTitle } from '../../utils/sectionTitles';
 
 interface TemplateProps {
   resumeData: ResumeSchema;
@@ -42,7 +44,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     return (
       <section key="experience" className={`resume-section ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
         <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-0.5 mb-2 leading-snug`}>
-          Experience
+          {getSectionTitle(resumeData, 'experience', 'Experience')}
         </h2>
         <div className={isSinglePageFit ? 'space-y-2.5' : 'space-y-3.5'}>
           {experience.map((exp) => (
@@ -81,7 +83,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     return (
       <section key="skills" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
         <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-0.5 mb-1.5 leading-snug`}>
-          Competencies
+          {getSectionTitle(resumeData, 'skills', 'Competencies')}
         </h2>
         <div className="grid grid-cols-2 gap-2 text-zinc-700 font-light text-xs">
           {skills.languages && skills.languages.length > 0 && (
@@ -113,7 +115,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     return (
       <section key="projects" className={`resume-section ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
         <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-0.5 mb-2 leading-snug`}>
-          Selected Work
+          {getSectionTitle(resumeData, 'projects', 'Selected Work')}
         </h2>
         <div className={isSinglePageFit ? 'space-y-2' : 'space-y-3'}>
           {projects.map((p) => (
@@ -138,7 +140,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     return (
       <section key="education" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
         <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-0.5 mb-1.5 leading-snug`}>
-          Education
+          {getSectionTitle(resumeData, 'education', 'Education')}
         </h2>
         <div className="space-y-1.5">
           {education.map((edu) => (
@@ -162,7 +164,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     return (
       <section key="certifications" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
         <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-0.5 mb-1.5 leading-snug`}>
-          Certifications
+          {getSectionTitle(resumeData, 'certifications', 'Certifications')}
         </h2>
         <div className="space-y-1">
           {certifications.map((c) => (
@@ -257,7 +259,11 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
 
       {/* Render Sections */}
       <div>
-        {sectionOrder.map((sec) => renderSectionByKey(sec))}
+        {sectionOrder.map((sec, idx) => (
+          <DraggableSection key={sec} sectionId={sec} index={idx} total={sectionOrder.length}>
+            {renderSectionByKey(sec)}
+          </DraggableSection>
+        ))}
       </div>
     </div>
   );

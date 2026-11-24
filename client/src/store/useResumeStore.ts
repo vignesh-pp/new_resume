@@ -41,9 +41,11 @@ interface ResumeStoreState {
   addCustomSectionItem: (sectionId: string) => void;
   updateCustomSectionItem: (sectionId: string, index: number, updated: Partial<CustomSectionItem>) => void;
   removeCustomSectionItem: (sectionId: string, index: number) => void;
+  updateSectionTitle: (sectionKey: string, title: string) => void;
   toggleSectionVisibility: (section: string) => void;
   reorderSections: (newOrder: string[]) => void;
   moveSectionOrder: (sectionKey: string, direction: 'up' | 'down') => void;
+  moveSectionToPosition: (sourceKey: string, targetKey: string, position?: 'before' | 'after') => void;
   setSectionColumn: (sectionKey: string, column: 'left' | 'right') => void;
   setTemplate: (templateId: TemplateId) => void;
   setTheme: (theme: Partial<ThemeSettings>) => void;
@@ -339,6 +341,17 @@ export const useResumeStore = create<ResumeStoreState>((set) => ({
       },
     })),
 
+  updateSectionTitle: (sectionKey, title) =>
+    set((state) => ({
+      resumeData: {
+        ...state.resumeData,
+        sectionTitles: {
+          ...(state.resumeData.sectionTitles || {}),
+          [sectionKey]: title,
+        },
+      },
+    })),
+
   toggleSectionVisibility: (section) =>
     set((state) => ({
       resumeData: {
@@ -372,6 +385,36 @@ export const useResumeStore = create<ResumeStoreState>((set) => ({
         resumeData: {
           ...state.resumeData,
           sectionOrder: order,
+        },
+      };
+    }),
+
+  moveSectionToPosition: (sourceKey, targetKey, position = 'before') =>
+    set((state) => {
+      const defaultOrder = ['summary', 'experience', 'skills', 'projects', 'education', 'certifications'];
+      const baseOrder = (state.resumeData.sectionOrder && state.resumeData.sectionOrder.length > 0)
+        ? state.resumeData.sectionOrder
+        : defaultOrder;
+      const customIds = (state.resumeData.customSections || []).map((s) => s.id);
+      const fullOrder = [
+        ...baseOrder,
+        ...customIds.filter((id) => !baseOrder.includes(id)),
+      ];
+
+      const fromIndex = fullOrder.indexOf(sourceKey);
+      if (fromIndex === -1) return state;
+
+      const orderWithoutSource = fullOrder.filter((k) => k !== sourceKey);
+      const toIndex = orderWithoutSource.indexOf(targetKey);
+      if (toIndex === -1) return state;
+
+      const insertIndex = position === 'after' ? toIndex + 1 : toIndex;
+      orderWithoutSource.splice(insertIndex, 0, sourceKey);
+
+      return {
+        resumeData: {
+          ...state.resumeData,
+          sectionOrder: orderWithoutSource,
         },
       };
     }),

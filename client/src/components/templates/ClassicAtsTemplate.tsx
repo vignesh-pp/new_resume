@@ -1,6 +1,8 @@
 import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
 import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
+import { DraggableSection } from '../preview/DraggableSection';
+import { getSectionTitle } from '../../utils/sectionTitles';
 
 interface TemplateProps {
   resumeData: ResumeSchema;
@@ -42,7 +44,7 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     return (
       <section key="summary" className="resume-section break-inside-avoid print:break-inside-avoid">
         <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor }}>
-          Professional Summary
+          {getSectionTitle(resumeData, 'summary', 'Professional Summary')}
         </h2>
         <p className="text-gray-800 text-justify leading-relaxed">{summary}</p>
       </section>
@@ -55,7 +57,7 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     return (
       <section key="experience" className="resume-section">
         <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-2 leading-snug`} style={{ color: theme.primaryColor }}>
-          Work Experience
+          {getSectionTitle(resumeData, 'experience', 'Work Experience')}
         </h2>
         <div className={isSinglePageFit ? 'space-y-2.5' : 'space-y-3.5'}>
           {experience.map((exp) => (
@@ -96,7 +98,7 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     return (
       <section key="skills" className="resume-section break-inside-avoid print:break-inside-avoid">
         <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor }}>
-          Skills & Competencies
+          {getSectionTitle(resumeData, 'skills', 'Skills & Competencies')}
         </h2>
         <div className={`grid ${gridColsClass} gap-x-4 gap-y-1.5 text-gray-800 leading-snug`}>
           {skills.languages && skills.languages.length > 0 && (
@@ -134,7 +136,7 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     return (
       <section key="projects" className="resume-section">
         <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-2 leading-snug`} style={{ color: theme.primaryColor }}>
-          Projects
+          {getSectionTitle(resumeData, 'projects', 'Projects')}
         </h2>
         <div className={isSinglePageFit ? 'space-y-2' : 'space-y-2.5'}>
           {projects.map((proj) => (
@@ -176,7 +178,7 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     return (
       <section key="education" className="resume-section break-inside-avoid print:break-inside-avoid">
         <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-2 leading-snug`} style={{ color: theme.primaryColor }}>
-          Education
+          {getSectionTitle(resumeData, 'education', 'Education')}
         </h2>
         <div className="space-y-2">
           {education.map((edu) => (
@@ -205,7 +207,7 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     return (
       <section key="certifications" className="resume-section break-inside-avoid print:break-inside-avoid">
         <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor }}>
-          Certifications
+          {getSectionTitle(resumeData, 'certifications', 'Certifications')}
         </h2>
         <ul className="space-y-1 text-gray-800">
           {certifications.map((cert) => (
@@ -327,46 +329,86 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
             <>
               {sectionOrder
                 .filter((s) => s !== 'education' && s !== 'certifications')
-                .map((sec) => renderSectionByKey(sec))}
+                .map((sec, idx) => (
+                  <DraggableSection key={sec} sectionId={sec} index={idx} total={sectionOrder.length}>
+                    {renderSectionByKey(sec)}
+                  </DraggableSection>
+                ))}
               
               {/* Dual Column Row for Education & Certifications */}
               {(visibleSections.education !== false || visibleSections.certifications !== false) && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                  <div>{renderEducation()}</div>
-                  <div>{renderCertifications()}</div>
+                  <div>
+                    <DraggableSection sectionId="education" index={sectionOrder.indexOf('education')} total={sectionOrder.length}>
+                      {renderEducation()}
+                    </DraggableSection>
+                  </div>
+                  <div>
+                    <DraggableSection sectionId="certifications" index={sectionOrder.indexOf('certifications')} total={sectionOrder.length}>
+                      {renderCertifications()}
+                    </DraggableSection>
+                  </div>
                 </div>
               )}
             </>
           ) : (
-            sectionOrder.map((sec) => renderSectionByKey(sec))
+            sectionOrder.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={sectionOrder.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))
           )}
         </div>
       ) : layoutMode === 'two-column-left' ? (
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pt-2">
           <div className="md:col-span-4 space-y-4 border-r border-gray-200 pr-4">
-            {leftSections.map((sec) => renderSectionByKey(sec))}
+            {leftSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={leftSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
           <div className="md:col-span-8 space-y-4">
-            {rightSections.map((sec) => renderSectionByKey(sec))}
+            {rightSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={rightSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
         </div>
       ) : layoutMode === 'two-column-right' ? (
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pt-2">
           <div className="md:col-span-8 space-y-4 border-r border-gray-200 pr-4">
-            {rightSections.map((sec) => renderSectionByKey(sec))}
+            {rightSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={rightSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
           <div className="md:col-span-4 space-y-4">
-            {leftSections.map((sec) => renderSectionByKey(sec))}
+            {leftSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={leftSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
         </div>
       ) : (
         /* Equal 50/50 Columns */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
           <div className="space-y-4 border-r border-gray-200 pr-4">
-            {leftSections.map((sec) => renderSectionByKey(sec))}
+            {leftSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={leftSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
           <div className="space-y-4">
-            {rightSections.map((sec) => renderSectionByKey(sec))}
+            {rightSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={rightSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
         </div>
       )}

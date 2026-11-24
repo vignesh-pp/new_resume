@@ -1,6 +1,8 @@
 import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
 import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
+import { DraggableSection } from '../preview/DraggableSection';
+import { getSectionTitle } from '../../utils/sectionTitles';
 
 interface TemplateProps {
   resumeData: ResumeSchema;
@@ -32,7 +34,7 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
     return (
       <section key="summary" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-4'}`}>
         <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-widest text-gray-900 border-b border-gray-400 pb-0.5 mb-1.5 leading-snug`}>
-          Research Statement & Academic Focus
+          {getSectionTitle(resumeData, 'summary', 'Research Statement & Academic Focus')}
         </h2>
         <p className="leading-relaxed text-justify text-gray-800">{summary}</p>
       </section>
@@ -45,7 +47,7 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
     return (
       <section key="education" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-4'}`}>
         <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-widest text-gray-900 border-b border-gray-400 pb-0.5 mb-1.5 leading-snug`}>
-          Education
+          {getSectionTitle(resumeData, 'education', 'Education')}
         </h2>
         <div className="space-y-1.5">
           {education.map((edu) => (
@@ -81,7 +83,7 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
     return (
       <section key="experience" className={`resume-section ${isSinglePageFit ? 'mb-3' : 'mb-4'}`}>
         <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-widest text-gray-900 border-b border-gray-400 pb-0.5 mb-1.5 leading-snug`}>
-          Appointments & Research Experience
+          {getSectionTitle(resumeData, 'experience', 'Appointments & Research Experience')}
         </h2>
         <div className={isSinglePageFit ? 'space-y-2.5' : 'space-y-3'}>
           {experience.map((exp) => (
@@ -117,7 +119,7 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
     return (
       <section key="projects" className={`resume-section ${isSinglePageFit ? 'mb-3' : 'mb-4'}`}>
         <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-widest text-gray-900 border-b border-gray-400 pb-0.5 mb-1.5 leading-snug`}>
-          Publications & Working Papers
+          {getSectionTitle(resumeData, 'projects', 'Publications & Working Papers')}
         </h2>
         <div className="space-y-1.5 text-xs">
           {projects.map((p) => (
@@ -138,7 +140,7 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
       return (
         <section key="certifications" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-4'}`}>
           <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-widest text-gray-900 border-b border-gray-400 pb-0.5 mb-1.5 leading-snug`}>
-            Grants, Fellowships & Honors
+            {getSectionTitle(resumeData, 'certifications', 'Grants, Fellowships & Honors')}
           </h2>
           <ul className="space-y-1 text-gray-800 text-xs">
             {certifications.map((c) => (
@@ -232,7 +234,11 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
 
       {/* Render Academic Sections */}
       <div>
-        {sectionOrder.map((sec) => renderSectionByKey(sec))}
+        {sectionOrder.map((sec, idx) => (
+          <DraggableSection key={sec} sectionId={sec} index={idx} total={sectionOrder.length}>
+            {renderSectionByKey(sec)}
+          </DraggableSection>
+        ))}
       </div>
     </div>
   );

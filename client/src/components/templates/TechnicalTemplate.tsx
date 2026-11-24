@@ -2,6 +2,8 @@ import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
 import { Terminal, Github, Globe, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
 import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
+import { DraggableSection } from '../preview/DraggableSection';
+import { getSectionTitle } from '../../utils/sectionTitles';
 
 interface TemplateProps {
   resumeData: ResumeSchema;
@@ -49,7 +51,7 @@ export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
     return (
       <section key="skills" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-4'} bg-slate-50 p-2.5 rounded border border-slate-200`}>
         <h2 className="text-[11px] font-mono font-bold uppercase tracking-wider text-teal-700 mb-1.5 leading-snug">
-          [01] Technical Stack Matrix
+          {getSectionTitle(resumeData, 'skills', '[01] Technical Stack Matrix')}
         </h2>
         <div className={`grid ${gridColsClass} gap-1.5 text-xs font-mono`}>
           {skills.languages && skills.languages.length > 0 && (
@@ -86,7 +88,7 @@ export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
     return (
       <section key="experience" className={`resume-section ${isSinglePageFit ? 'mb-3' : 'mb-4'}`}>
         <h2 className="text-[11px] font-mono font-bold uppercase tracking-wider text-teal-700 border-b border-slate-200 pb-0.5 mb-2 leading-snug">
-          [02] Work History
+          {getSectionTitle(resumeData, 'experience', '[02] Work History')}
         </h2>
         <div className={isSinglePageFit ? 'space-y-2.5' : 'space-y-3'}>
           {experience.map((exp) => (
@@ -123,7 +125,7 @@ export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
     return (
       <section key="projects" className={`resume-section ${isSinglePageFit ? 'mb-3' : 'mb-4'}`}>
         <h2 className="text-[11px] font-mono font-bold uppercase tracking-wider text-teal-700 border-b border-slate-200 pb-0.5 mb-2 leading-snug">
-          [03] Open Source & Systems Architecture
+          {getSectionTitle(resumeData, 'projects', '[03] Open Source & Systems Architecture')}
         </h2>
         <div className={isSinglePageFit ? 'space-y-2' : 'space-y-2.5'}>
           {projects.map((proj) => (
@@ -154,7 +156,7 @@ export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
     return (
       <section key="education" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-4'}`}>
         <h2 className="text-[11px] font-mono font-bold uppercase tracking-wider text-teal-700 border-b border-slate-200 pb-0.5 mb-1.5 leading-snug">
-          [04] Education & Credentials
+          {getSectionTitle(resumeData, 'education', '[04] Education & Credentials')}
         </h2>
         <div className="space-y-1 text-xs">
           {education.map((edu) => (
@@ -177,7 +179,7 @@ export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
     return (
       <section key="certifications" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-4'}`}>
         <h2 className="text-[11px] font-mono font-bold uppercase tracking-wider text-teal-700 border-b border-slate-200 pb-0.5 mb-1.5 leading-snug">
-          [05] Licenses & Certifications
+          {getSectionTitle(resumeData, 'certifications', '[05] Licenses & Certifications')}
         </h2>
         <div className="space-y-1 text-xs">
           {certifications.map((c) => (
@@ -293,34 +295,62 @@ export const TechnicalTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
       {/* Row vs Column Body */}
       {layoutMode === 'single-column' ? (
         <div>
-          {sectionOrder.map((sec) => renderSectionByKey(sec))}
+          {sectionOrder.map((sec, idx) => (
+            <DraggableSection key={sec} sectionId={sec} index={idx} total={sectionOrder.length}>
+              {renderSectionByKey(sec)}
+            </DraggableSection>
+          ))}
         </div>
       ) : layoutMode === 'two-column-left' ? (
         <div className="grid grid-cols-1 md:grid-cols-12 gap-5 pt-1">
           <div className="md:col-span-4 space-y-3.5 border-r border-slate-200 pr-3">
-            {leftSections.map((sec) => renderSectionByKey(sec))}
+            {leftSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={leftSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
           <div className="md:col-span-8 space-y-3.5">
-            {rightSections.map((sec) => renderSectionByKey(sec))}
+            {rightSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={rightSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
         </div>
       ) : layoutMode === 'two-column-right' ? (
         <div className="grid grid-cols-1 md:grid-cols-12 gap-5 pt-1">
           <div className="md:col-span-8 space-y-3.5 border-r border-slate-200 pr-3">
-            {rightSections.map((sec) => renderSectionByKey(sec))}
+            {rightSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={rightSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
           <div className="md:col-span-4 space-y-3.5">
-            {leftSections.map((sec) => renderSectionByKey(sec))}
+            {leftSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={leftSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
         </div>
       ) : (
         /* Equal 50/50 Columns */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
           <div className="space-y-3.5 border-r border-slate-200 pr-3">
-            {leftSections.map((sec) => renderSectionByKey(sec))}
+            {leftSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={leftSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
           <div className="space-y-3.5">
-            {rightSections.map((sec) => renderSectionByKey(sec))}
+            {rightSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={rightSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
         </div>
       )}

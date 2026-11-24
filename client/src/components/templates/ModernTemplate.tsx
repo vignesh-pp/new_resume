@@ -2,6 +2,8 @@ import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
 import { Mail, Phone, MapPin, Globe, Linkedin, Github } from 'lucide-react';
 import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
+import { DraggableSection } from '../preview/DraggableSection';
+import { getSectionTitle } from '../../utils/sectionTitles';
 
 interface TemplateProps {
   resumeData: ResumeSchema;
@@ -38,7 +40,9 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
       <section key="summary" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mt-2.5' : 'mt-4'}`}>
         <div className="flex items-center gap-2 mb-1.5">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
-          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>About Me</h2>
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>
+            {getSectionTitle(resumeData, 'summary', 'About Me')}
+          </h2>
         </div>
         <p className="leading-relaxed text-slate-600 pl-4 border-l-2 border-slate-100">{summary}</p>
       </section>
@@ -51,7 +55,9 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
       <section key="experience" className={`resume-section ${isSinglePageFit ? 'mt-2.5' : 'mt-4'}`}>
         <div className="flex items-center gap-2 mb-2">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
-          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>Experience</h2>
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>
+            {getSectionTitle(resumeData, 'experience', 'Experience')}
+          </h2>
         </div>
         <div className={`pl-4 border-l-2 border-slate-100 ${isSinglePageFit ? 'space-y-2.5' : 'space-y-4'}`}>
           {experience.map((exp) => (
@@ -90,7 +96,9 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
       <section key="skills" className="mt-4">
         <div className="flex items-center gap-2 mb-2.5">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
-          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>Skills & Tech Stack</h2>
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>
+            {getSectionTitle(resumeData, 'skills', 'Skills & Tech Stack')}
+          </h2>
         </div>
         <div className="pl-4 border-l-2 border-slate-100 space-y-2 text-xs">
           {skills.languages && skills.languages.length > 0 && (
@@ -134,7 +142,9 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
       <section key="projects" className={`resume-section ${isSinglePageFit ? 'mt-2.5' : 'mt-4'}`}>
         <div className="flex items-center gap-2 mb-2">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
-          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>Featured Projects</h2>
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>
+            {getSectionTitle(resumeData, 'projects', 'Featured Projects')}
+          </h2>
         </div>
         <div className={`pl-4 border-l-2 border-slate-100 ${isSinglePageFit ? 'space-y-2' : 'space-y-3'}`}>
           {projects.map((p) => (
@@ -168,7 +178,9 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
       <section key="education" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mt-2.5' : 'mt-4'}`}>
         <div className="flex items-center gap-2 mb-2">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
-          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>Education</h2>
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>
+            {getSectionTitle(resumeData, 'education', 'Education')}
+          </h2>
         </div>
         <div className="space-y-2 pl-4 border-l-2 border-slate-100">
           {education.map((edu) => (
@@ -191,7 +203,9 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
       <section key="certifications" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mt-2.5' : 'mt-4'}`}>
         <div className="flex items-center gap-2 mb-2">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
-          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>Certifications</h2>
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>
+            {getSectionTitle(resumeData, 'certifications', 'Certifications')}
+          </h2>
         </div>
         <div className="space-y-1.5 pl-4 border-l-2 border-slate-100 text-xs">
           {certifications.map((c) => (
@@ -324,34 +338,62 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
       {/* Dynamic Row vs Column Body */}
       {layoutMode === 'single-column' ? (
         <div className="space-y-2">
-          {sectionOrder.map((sec) => renderSectionByKey(sec))}
+          {sectionOrder.map((sec, idx) => (
+            <DraggableSection key={sec} sectionId={sec} index={idx} total={sectionOrder.length}>
+              {renderSectionByKey(sec)}
+            </DraggableSection>
+          ))}
         </div>
       ) : layoutMode === 'two-column-left' ? (
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pt-2">
           <div className="md:col-span-4 space-y-4 border-r border-slate-100 pr-4">
-            {leftSections.map((sec) => renderSectionByKey(sec))}
+            {leftSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={leftSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
           <div className="md:col-span-8 space-y-4">
-            {rightSections.map((sec) => renderSectionByKey(sec))}
+            {rightSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={rightSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
         </div>
       ) : layoutMode === 'two-column-right' ? (
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pt-2">
           <div className="md:col-span-8 space-y-4 border-r border-slate-100 pr-4">
-            {rightSections.map((sec) => renderSectionByKey(sec))}
+            {rightSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={rightSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
           <div className="md:col-span-4 space-y-4">
-            {leftSections.map((sec) => renderSectionByKey(sec))}
+            {leftSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={leftSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
         </div>
       ) : (
         /* Equal 50/50 Columns */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
           <div className="space-y-4 border-r border-slate-100 pr-4">
-            {leftSections.map((sec) => renderSectionByKey(sec))}
+            {leftSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={leftSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
           <div className="space-y-4">
-            {rightSections.map((sec) => renderSectionByKey(sec))}
+            {rightSections.map((sec, idx) => (
+              <DraggableSection key={sec} sectionId={sec} index={idx} total={rightSections.length}>
+                {renderSectionByKey(sec)}
+              </DraggableSection>
+            ))}
           </div>
         </div>
       )}

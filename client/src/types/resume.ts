@@ -85,6 +85,7 @@ export interface ResumeSchema {
   customSections: CustomSection[];
   sectionOrder: string[];
   visibleSections: Record<string, boolean>;
+  sectionTitles?: Record<string, string>;
 }
 
 export type TemplateId = 

@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { useResumeStore } from '../../store/useResumeStore';
 import { TEMPLATES_CONFIG } from '../../utils/templateDefinitions';
 import { TemplateId } from '../../types/resume';
+import { TemplateThumbnail } from '../common/TemplateThumbnail';
 import { Check, ShieldCheck, Sparkles, AlertCircle, Eye } from 'lucide-react';
 
 export const TemplateGallery: React.FC = () => {
-  const { activeTemplate, setTemplate, setActiveTab } = useResumeStore();
+  const { activeTemplate, setTemplate, theme, setActiveTab } = useResumeStore();
   const [filter, setFilter] = useState<string>('All');
 
   const categories = ['All', 'ATS', 'Modern', 'Executive', 'Creative', 'Technical', 'Academic'];
@@ -63,77 +64,13 @@ export const TemplateGallery: React.FC = () => {
                   : 'border-slate-200 hover:border-slate-300 hover:shadow-md'
               }`}
             >
-              {/* Thumbnail Container */}
-              <div className="relative h-56 bg-slate-100 overflow-hidden border-b border-slate-100 flex items-center justify-center p-4">
-                {/* Visual miniature representation */}
-                <div className="w-full h-full bg-white rounded-lg shadow-sm p-3 flex flex-col justify-between text-[6px] select-none pointer-events-none transform group-hover:scale-[1.02] transition-transform">
-                  {template.id === 'creative' ? (
-                    <div className="flex h-full gap-2">
-                      <div className="w-1/3 bg-slate-900 rounded p-1.5 text-white flex flex-col gap-1">
-                        <div className="w-4 h-4 rounded bg-purple-500 mb-1" />
-                        <div className="w-3/4 h-1 bg-slate-400 rounded" />
-                        <div className="w-1/2 h-1 bg-slate-600 rounded" />
-                        <div className="mt-2 w-full h-0.5 bg-slate-700" />
-                        <div className="w-full h-1 bg-slate-500 rounded" />
-                      </div>
-                      <div className="w-2/3 flex flex-col gap-1.5 p-1">
-                        <div className="w-1/2 h-1.5 bg-slate-900 rounded" />
-                        <div className="w-full h-1 bg-slate-200 rounded" />
-                        <div className="w-5/6 h-1 bg-slate-200 rounded" />
-                        <div className="mt-2 w-1/3 h-1 bg-purple-600 rounded" />
-                        <div className="w-full h-1 bg-slate-200 rounded" />
-                      </div>
-                    </div>
-                  ) : template.id === 'modern-pro' ? (
-                    <div className="flex flex-col h-full gap-1.5">
-                      <div className="h-1 w-full bg-blue-600 rounded-full" />
-                      <div className="flex justify-between items-center">
-                        <div className="w-1/3 h-2 bg-slate-900 rounded" />
-                        <div className="w-1/4 h-1 bg-slate-300 rounded" />
-                      </div>
-                      <div className="w-full h-1 bg-slate-100 rounded" />
-                      <div className="w-1/4 h-1.5 bg-blue-600 rounded mt-1" />
-                      <div className="w-full h-1 bg-slate-200 rounded" />
-                      <div className="w-5/6 h-1 bg-slate-200 rounded" />
-                      <div className="w-4/6 h-1 bg-slate-200 rounded" />
-                    </div>
-                  ) : template.id === 'technical' ? (
-                    <div className="flex flex-col h-full gap-1.5 font-mono">
-                      <div className="flex justify-between border-b pb-1">
-                        <div className="w-2/5 h-1.5 bg-teal-700 rounded" />
-                        <div className="w-1/5 h-1 bg-slate-300 rounded" />
-                      </div>
-                      <div className="p-1 bg-slate-50 border rounded flex flex-col gap-1">
-                        <div className="w-1/4 h-1 bg-teal-600 rounded" />
-                        <div className="w-full h-1 bg-slate-300 rounded" />
-                      </div>
-                      <div className="w-1/3 h-1 bg-teal-700 rounded mt-1" />
-                      <div className="w-full h-1 bg-slate-200 rounded" />
-                      <div className="w-4/5 h-1 bg-slate-200 rounded" />
-                    </div>
-                  ) : template.id === 'executive' ? (
-                    <div className="flex flex-col h-full gap-1.5 text-center">
-                      <div className="w-1/2 h-2 bg-slate-900 rounded mx-auto border-b pb-1" />
-                      <div className="w-1/3 h-1 bg-slate-400 rounded mx-auto" />
-                      <div className="p-1.5 bg-slate-50 border-l-2 border-slate-900 text-left my-1">
-                        <div className="w-full h-1 bg-slate-300 rounded" />
-                        <div className="w-3/4 h-1 bg-slate-300 rounded mt-0.5" />
-                      </div>
-                      <div className="w-1/3 h-1 bg-slate-800 rounded text-left border-b pb-0.5" />
-                      <div className="w-full h-1 bg-slate-200 rounded" />
-                    </div>
-                  ) : (
-                    <div className="flex flex-col h-full gap-1.5 text-center">
-                      <div className="w-2/5 h-2 bg-slate-900 rounded mx-auto" />
-                      <div className="w-1/3 h-1 bg-slate-400 rounded mx-auto" />
-                      <div className="w-3/5 h-0.5 bg-slate-200 rounded mx-auto mb-1" />
-                      <div className="w-1/4 h-1 bg-slate-800 rounded text-left border-b pb-0.5" />
-                      <div className="w-full h-1 bg-slate-200 rounded text-left" />
-                      <div className="w-5/6 h-1 bg-slate-200 rounded text-left" />
-                      <div className="w-1/4 h-1 bg-slate-800 rounded text-left border-b pb-0.5 mt-1" />
-                      <div className="w-full h-1 bg-slate-200 rounded text-left" />
-                    </div>
-                  )}
+              {/* Thumbnail Container with Realistic Resume Preview */}
+              <div className="relative h-64 bg-slate-100/80 overflow-hidden border-b border-slate-100 flex items-center justify-center p-3">
+                <div className="w-full h-full rounded-md shadow-xs overflow-hidden transform group-hover:scale-[1.02] transition-transform">
+                  <TemplateThumbnail
+                    templateId={template.id}
+                    primaryColor={theme.primaryColor}
+                  />
                 </div>
 
                 {/* ATS Score Tag */}

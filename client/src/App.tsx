@@ -12,6 +12,7 @@ import { UploadModal } from './components/upload/UploadModal';
 import { FontPickerModal } from './components/toolbar/FontPickerModal';
 import { ResumeVersionsModal } from './components/versions/ResumeVersionsModal';
 import { LayoutManagerModal } from './components/toolbar/LayoutManagerModal';
+import { TemplatePickerModal } from './components/toolbar/TemplatePickerModal';
 import { exportUtils } from './utils/exportUtils';
 import axios from 'axios';
 
@@ -30,6 +31,7 @@ export function App() {
   const [isFontModalOpen, setIsFontModalOpen] = useState(false);
   const [isVersionsModalOpen, setIsVersionsModalOpen] = useState(false);
   const [isLayoutModalOpen, setIsLayoutModalOpen] = useState(false);
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
 
   // Trigger ATS analysis
   const runAtsAnalysis = async () => {
@@ -82,57 +84,69 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col text-slate-900 font-sans antialiased">
+    <div className="h-screen max-h-screen w-screen overflow-hidden flex flex-col bg-slate-100 text-slate-900 font-sans antialiased print:h-auto print:max-h-none print:w-full print:bg-white print:overflow-visible">
       {/* Top Navbar */}
-      <Navbar
-        onExportPdf={handleDownloadPdf}
-        onExportDocx={handleDownloadDocx}
-        onOpenAtsModal={() => {
-          runAtsAnalysis();
-          setIsAtsModalOpen(true);
-        }}
-      />
+      <div className="shrink-0 z-30 print:hidden">
+        <Navbar
+          onExportPdf={handleDownloadPdf}
+          onExportDocx={handleDownloadDocx}
+          onOpenAtsModal={() => {
+            runAtsAnalysis();
+            setIsAtsModalOpen(true);
+          }}
+        />
+      </div>
 
       {/* Main Content Area */}
       {activeTab === 'templates' ? (
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 min-h-0 overflow-y-auto print:hidden">
           <TemplateGallery />
         </main>
       ) : (
-        <main className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 min-h-0 flex flex-col overflow-hidden print:block print:overflow-visible print:h-auto">
           {/* Sub Toolbar for Theme, Colors & AI triggers */}
-          <ThemeToolbar
-            onUploadClick={() => setIsUploadModalOpen(true)}
-            onAnalyzeClick={() => {
-              runAtsAnalysis();
-              setIsAtsModalOpen(true);
-            }}
-            onTailorClick={() => setShowTailorModal(true)}
-            onOpenFontModal={() => setIsFontModalOpen(true)}
-            onOpenVersionsModal={() => setIsVersionsModalOpen(true)}
-            onOpenLayoutModal={() => setIsLayoutModalOpen(true)}
-          />
+          <div className="shrink-0 z-20 print:hidden">
+            <ThemeToolbar
+              onUploadClick={() => setIsUploadModalOpen(true)}
+              onAnalyzeClick={() => {
+                runAtsAnalysis();
+                setIsAtsModalOpen(true);
+              }}
+              onTailorClick={() => setShowTailorModal(true)}
+              onOpenTemplateModal={() => setIsTemplateModalOpen(true)}
+              onOpenFontModal={() => setIsFontModalOpen(true)}
+              onOpenVersionsModal={() => setIsVersionsModalOpen(true)}
+              onOpenLayoutModal={() => setIsLayoutModalOpen(true)}
+            />
+          </div>
 
           {/* Split Pane: Left Editor | Right Live Preview */}
-          <div className="flex-1 flex flex-col lg:flex-row h-[calc(100vh-106px)] overflow-hidden">
-            {/* Editor Pane (Left) - Sticky and Smoothly Scrollable */}
-            <div className="w-full lg:w-[46%] xl:w-[44%] h-full overflow-y-auto border-r border-slate-200 bg-slate-50/60 custom-scrollbar pb-16">
+          <div className="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden print:block print:overflow-visible print:h-auto">
+            {/* Editor Pane (Left) - STRICTLY HIDDEN DURING PRINT */}
+            <div
+              id="resume-editor-pane"
+              className="resume-editor-pane w-full lg:w-[45%] xl:w-[44%] h-full min-h-0 overflow-y-auto border-r border-slate-200 bg-slate-50/60 custom-scrollbar pb-16 print:hidden"
+            >
               <ResumeEditor />
             </div>
 
-            {/* Live Preview Pane (Right) - Smoothly Scrollable Document View */}
-            <div className="w-full lg:w-[54%] xl:w-[56%] h-full overflow-hidden flex flex-col bg-slate-200/90">
+            {/* Live Preview Pane (Right) - Clean print output */}
+            <div className="w-full lg:w-[55%] xl:w-[56%] h-full min-h-0 overflow-hidden flex flex-col bg-slate-200/90 print:bg-white print:w-full print:h-auto print:overflow-visible print:p-0 print:m-0">
               <ResumePreview
                 onPrint={handlePrint}
                 onDownloadPdf={handleDownloadPdf}
                 onDownloadDocx={handleDownloadDocx}
-                onOpenFontModal={() => setIsFontModalOpen(true)}
-                onOpenLayoutModal={() => setIsLayoutModalOpen(true)}
               />
             </div>
           </div>
         </main>
       )}
+
+      {/* Modals */}
+      <TemplatePickerModal
+        isOpen={isTemplateModalOpen}
+        onClose={() => setIsTemplateModalOpen(false)}
+      />
 
       {/* Modals */}
       <AtsScoreModal
