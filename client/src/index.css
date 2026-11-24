@@ -44,14 +44,17 @@
 /* Print Styles */
 @media print {
   @page {
-    size: A4;
+    size: A4 portrait;
     margin: 0;
   }
 
-  body {
-    background: transparent !important;
+  html, body {
+    background: #ffffff !important;
     padding: 0 !important;
     margin: 0 !important;
+    width: 100% !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   /* Hide UI elements */
@@ -63,10 +66,26 @@
   #resume-printable-area {
     width: 100% !important;
     max-width: 100% !important;
-    margin: 0 !important;
-    padding: 20mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
     box-shadow: none !important;
     transform: none !important;
     border: none !important;
+  }
+
+  /* Prevent awkward page breaks */
+  .resume-section {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .resume-item {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  h1, h2, h3 {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
   }
 }

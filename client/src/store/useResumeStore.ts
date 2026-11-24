@@ -68,6 +68,7 @@ export const useResumeStore = create<ResumeStoreState>((set) => ({
     layoutMode: 'single-column',
     skillsColumns: 2,
     sideBySideEducationCert: false,
+    fitToSinglePage: true,
     leftSections: ['skills', 'education', 'certifications'],
     rightSections: ['summary', 'experience', 'projects'],
   },

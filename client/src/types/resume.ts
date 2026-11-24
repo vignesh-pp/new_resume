@@ -128,6 +128,7 @@ export interface ThemeSettings {
   layoutMode?: ColumnLayoutMode;
   skillsColumns?: 1 | 2 | 3;
   sideBySideEducationCert?: boolean;
+  fitToSinglePage?: boolean;
   leftSections?: string[];
   rightSections?: string[];
 }

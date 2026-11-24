@@ -4,7 +4,7 @@ import { ResumeRenderer } from '../templates/ResumeRenderer';
 import { TemplateStrip } from './TemplateStrip';
 import { 
   ZoomIn, ZoomOut, RotateCcw, Printer, Download, Type, 
-  FileText, Columns 
+  FileText, Columns, Sparkles, Check 
 } from 'lucide-react';
 
 interface ResumePreviewProps {
@@ -38,7 +38,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
 
         {/* Pinned Top Control Bar: Fonts, Columns, 1-Page Line, Zoom, Export */}
         <div className="flex flex-wrap items-center justify-between px-4 py-2 bg-white gap-2 border-t border-slate-100">
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             {onOpenFontModal && (
               <button
                 onClick={onOpenFontModal}
@@ -61,6 +61,20 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
               </button>
             )}
 
+            {/* 1-Page Auto-Fit Toggle */}
+            <button
+              onClick={() => setTheme({ fitToSinglePage: !theme.fitToSinglePage })}
+              className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                theme.fitToSinglePage
+                  ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
+                  : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+              }`}
+              title="Automatically optimize spacing, margins and line-heights to fit cleanly on 1 page"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+              <span>{theme.fitToSinglePage ? '1-Page Fit: ON' : '1-Page Fit: OFF'}</span>
+            </button>
+
             <button
               onClick={() => setTheme({ showPageBreakGuide: !theme.showPageBreakGuide })}
               className={`px-2 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors ${
@@ -71,7 +85,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
               title="Toggle 1-page A4 cutoff guide"
             >
               <FileText className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">1-Page Line</span>
+              <span className="hidden sm:inline">A4 Line</span>
             </button>
           </div>
 
@@ -114,11 +128,11 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
             {onPrint && (
               <button
                 onClick={onPrint}
-                className="p-1.5 px-2 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-1 text-xs font-semibold"
-                title="Print Resume"
+                className="p-1.5 px-2.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-1.5 text-xs font-semibold shadow-2xs"
+                title="Print or Save as Vector PDF (Native Chrome Engine with Selectable Text)"
               >
-                <Printer className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Print</span>
+                <Printer className="w-3.5 h-3.5 text-slate-600" />
+                <span className="hidden sm:inline">Print / Vector PDF</span>
               </button>
             )}
 
@@ -126,7 +140,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
               <button
                 onClick={onDownloadPdf}
                 className="p-1.5 px-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-1.5 text-xs font-semibold shadow-xs"
-                title="Download Vector PDF"
+                title="Direct PDF Download with Smart Auto-Fit"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>PDF</span>
@@ -169,14 +183,14 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
             }}
             className="relative bg-white shadow-2xl rounded-md print:transform-none print:shadow-none print:m-0 print:p-0 ring-1 ring-slate-900/5 select-text"
           >
-            {/* Optional A4 1-Page Cutoff Guide Line */}
+            {/* Optional A4 1-Page Cutoff Guide Line (800px * 297/210 = 1131.43px) */}
             {theme.showPageBreakGuide && (
               <div 
                 className="absolute left-0 right-0 border-b-2 border-dashed border-rose-400 z-20 pointer-events-none flex items-center justify-end pr-4"
-                style={{ top: '1050px' }}
+                style={{ top: '1131px' }}
               >
                 <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
-                  ✂ 1-Page A4 Cutoff Boundary
+                  ✂ A4 1-Page Cutoff (1131px)
                 </span>
               </div>
             )}
@@ -192,3 +206,4 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
     </div>
   );
 };
+

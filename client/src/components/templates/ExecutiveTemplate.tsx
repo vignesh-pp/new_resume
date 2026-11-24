@@ -13,14 +13,15 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
   const fontStyle = { fontFamily: getFontFamilyCss(theme.fontFamily) };
   const sizeClasses = getFontSizeClasses(theme.fontSize);
   const bulletIcon = getBulletIcon(theme.bulletStyle);
+  const isSinglePageFit = theme.fitToSinglePage || theme.spacing === 'compact';
 
   return (
     <div 
       style={fontStyle}
-      className={`w-full max-w-[800px] mx-auto bg-white text-slate-900 p-8 shadow-sm ${sizeClasses.body} print:p-0 print:shadow-none`}
+      className={`w-full max-w-[800px] mx-auto bg-white text-slate-900 ${isSinglePageFit ? 'py-5 px-6 sm:py-6 sm:px-8' : 'p-7 sm:p-8'} shadow-sm ${sizeClasses.body} print:p-0 print:shadow-none`}
     >
       {/* Executive Double Border Header */}
-      <header className="flex flex-col sm:flex-row items-center justify-between pb-4 border-b-2 border-slate-900 gap-4">
+      <header className={`flex flex-col sm:flex-row items-center justify-between border-b-2 border-slate-900 gap-4 ${isSinglePageFit ? 'pb-3 mb-2' : 'pb-4 mb-3'}`}>
         {theme.showPhoto && personalInfo.photoUrl && (
           <img
             src={personalInfo.photoUrl}
@@ -36,20 +37,20 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
             {personalInfo.fullName}
           </h1>
           {personalInfo.jobTitle && (
-            <p className="text-sm tracking-widest text-slate-600 uppercase mt-1">
+            <p className="text-sm tracking-widest text-slate-600 uppercase mt-0.5">
               {personalInfo.jobTitle}
             </p>
           )}
-          <div className="flex flex-wrap justify-center sm:justify-start items-center gap-x-3 text-xs text-slate-600 mt-2">
-            {personalInfo.location && <span>{personalInfo.location}</span>}
-            {personalInfo.phone && <span>| {personalInfo.phone}</span>}
+          <div className="flex flex-wrap justify-center sm:justify-start items-center gap-x-3 text-xs text-slate-600 mt-1.5">
+            {personalInfo.location && <span className="whitespace-nowrap">{personalInfo.location}</span>}
+            {personalInfo.phone && <span className="whitespace-nowrap">| {personalInfo.phone}</span>}
             {personalInfo.email && (
-              <span>
+              <span className="whitespace-nowrap">
                 | <a href={`mailto:${personalInfo.email}`} className="text-slate-900 underline">{personalInfo.email}</a>
               </span>
             )}
             {personalInfo.linkedin && (
-              <span>
+              <span className="whitespace-nowrap">
                 | <a href={personalInfo.linkedin} target="_blank" rel="noreferrer" className="text-slate-900 underline">LinkedIn</a>
               </span>
             )}
@@ -59,8 +60,8 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
 
       {/* Executive Summary */}
       {visibleSections.summary !== false && summary && (
-        <section className="my-5 bg-slate-50 p-4 border-l-4" style={{ borderColor: theme.primaryColor }}>
-          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 mb-1`}>
+        <section className={`resume-section break-inside-avoid print:break-inside-avoid bg-slate-50 border-l-4 ${isSinglePageFit ? 'my-3 p-3' : 'my-4 p-4'}`} style={{ borderColor: theme.primaryColor }}>
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 mb-1 leading-snug`}>
             Executive Profile & Leadership Scope
           </h2>
           <p className="leading-relaxed text-slate-800 text-justify">{summary}</p>
@@ -69,28 +70,28 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
 
       {/* Leadership Experience */}
       {visibleSections.experience !== false && experience && experience.length > 0 && (
-        <section className="mb-5">
-          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b border-slate-400 pb-1 mb-3`}>
+        <section className={`resume-section ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-[1.5px] border-slate-400 pb-0.5 mb-2 leading-snug`}>
             Professional Experience & Career History
           </h2>
-          <div className="space-y-4">
+          <div className={isSinglePageFit ? 'space-y-2.5' : 'space-y-4'}>
             {experience.map((exp) => (
-              <div key={exp.id}>
-                <div className="flex justify-between items-baseline">
-                  <div>
+              <div key={exp.id} className="resume-item break-inside-avoid print:break-inside-avoid">
+                <div className="flex justify-between items-start gap-3">
+                  <div className="flex-1 min-w-0">
                     <span className="font-bold text-slate-900 text-sm">{exp.role}</span>
                     <span className="text-slate-700">, {exp.company}</span>
-                    {exp.location && <span className="text-xs text-slate-500"> — {exp.location}</span>}
+                    {exp.location && <span className="text-xs text-slate-500 whitespace-nowrap"> — {exp.location}</span>}
                   </div>
-                  <span className="text-xs font-semibold text-slate-600">
+                  <span className="text-xs font-semibold text-slate-600 shrink-0 ml-2 whitespace-nowrap text-right">
                     {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
                   </span>
                 </div>
                 {exp.bullets && exp.bullets.length > 0 && (
-                  <ul className="mt-1.5 space-y-1 text-slate-800">
+                  <ul className={`mt-1 text-slate-800 ${isSinglePageFit ? 'space-y-0.5' : 'space-y-1'}`}>
                     {exp.bullets.map((b, idx) => (
-                      <li key={idx} className="leading-relaxed pl-2 border-l border-slate-300 flex items-start gap-1.5">
-                        <span className="text-slate-500 font-bold shrink-0">{bulletIcon}</span>
+                      <li key={idx} className={`pl-2 border-l border-slate-300 flex items-start gap-1.5 ${isSinglePageFit ? 'leading-snug' : 'leading-relaxed'}`}>
+                        <span className="text-slate-500 font-bold shrink-0 mt-0.5">{bulletIcon}</span>
                         <span>{b}</span>
                       </li>
                     ))}
@@ -104,11 +105,11 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
 
       {/* Core Competencies */}
       {visibleSections.skills !== false && (
-        <section className="mb-5">
-          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b border-slate-400 pb-1 mb-2`}>
+        <section className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-[1.5px] border-slate-400 pb-0.5 mb-2 leading-snug`}>
             Strategic Competencies & Board Focus
           </h2>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
             {skills.technical && skills.technical.length > 0 && (
               <div>
                 <span className="font-bold text-slate-900 block mb-0.5">Enterprise & Strategy:</span>
@@ -133,24 +134,24 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
 
       {/* Education & Credentials */}
       {visibleSections.education !== false && education && education.length > 0 && (
-        <section>
-          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b border-slate-400 pb-1 mb-2`}>
+        <section className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-4'}`}>
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-[1.5px] border-slate-400 pb-0.5 mb-2 leading-snug`}>
             Education & Executive Credentials
           </h2>
-          <div className="space-y-2 text-xs">
+          <div className="space-y-1.5 text-xs">
             {education.map((edu) => (
-              <div key={edu.id} className="flex justify-between items-baseline">
-                <div>
+              <div key={edu.id} className="flex justify-between items-start gap-3 resume-item break-inside-avoid print:break-inside-avoid">
+                <div className="flex-1 min-w-0">
                   <span className="font-bold text-slate-900">{edu.degree} in {edu.fieldOfStudy}</span>
                   <span className="text-slate-700"> — {edu.institution}</span>
                 </div>
-                <span className="text-slate-500">{edu.startDate} – {edu.endDate}</span>
+                <span className="text-slate-500 shrink-0 ml-2 whitespace-nowrap text-right">{edu.startDate} – {edu.endDate}</span>
               </div>
             ))}
             {certifications && certifications.map((c) => (
-              <div key={c.id} className="flex justify-between items-baseline text-slate-700">
-                <span>{c.name} — {c.issuer}</span>
-                <span>{c.date}</span>
+              <div key={c.id} className="flex justify-between items-start gap-3 text-slate-700 resume-item break-inside-avoid print:break-inside-avoid">
+                <span className="flex-1 min-w-0">{c.name} — {c.issuer}</span>
+                <span className="shrink-0 ml-2 whitespace-nowrap text-right">{c.date}</span>
               </div>
             ))}
           </div>
@@ -161,16 +162,16 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
       {(resumeData.customSections || []).map((sec) => {
         if (visibleSections[sec.id] === false || !sec.items?.length) return null;
         return (
-          <section key={sec.id} className="mt-4">
-            <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b border-slate-400 pb-1 mb-2`}>
+          <section key={sec.id} className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mt-2.5' : 'mt-4'}`}>
+            <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-[1.5px] border-slate-400 pb-0.5 mb-2 leading-snug`}>
               {sec.title}
             </h2>
             <div className="space-y-2 text-xs">
               {sec.items.map((it, idx) => (
-                <div key={idx} className="pb-1.5">
-                  <div className="flex justify-between items-baseline">
-                    <span className="font-bold text-slate-900">{it.title}</span>
-                    {it.date && <span className="text-slate-500 font-medium">{it.date}</span>}
+                <div key={idx} className="pb-1 resume-item break-inside-avoid print:break-inside-avoid">
+                  <div className="flex justify-between items-start gap-3">
+                    <span className="font-bold text-slate-900 flex-1 min-w-0">{it.title}</span>
+                    {it.date && <span className="text-slate-500 font-medium shrink-0 ml-2 whitespace-nowrap text-right">{it.date}</span>}
                   </div>
                   {it.subtitle && <p className="text-slate-700 italic">{it.subtitle}</p>}
                   {it.description && <p className="text-slate-800 mt-0.5 leading-relaxed">{it.description}</p>}

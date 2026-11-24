@@ -14,11 +14,13 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
   const sizeClasses = getFontSizeClasses(theme.fontSize);
   const bulletIcon = getBulletIcon(theme.bulletStyle);
 
+  const isSinglePageFit = theme.fitToSinglePage || theme.spacing === 'compact';
+
   const spacingClass = {
-    'compact': 'space-y-2.5',
-    'normal': 'space-y-4',
+    'compact': 'space-y-2',
+    'normal': isSinglePageFit ? 'space-y-2.5' : 'space-y-3.5',
     'spacious': 'space-y-5',
-  }[theme.spacing] || 'space-y-4';
+  }[theme.spacing] || (isSinglePageFit ? 'space-y-2.5' : 'space-y-3.5');
 
   const defaultOrder = ['summary', 'experience', 'skills', 'projects', 'education', 'certifications'];
   const baseOrder = (resumeData.sectionOrder && resumeData.sectionOrder.length > 0)
@@ -38,8 +40,8 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
   const renderSummary = () => {
     if (visibleSections.summary === false || !summary) return null;
     return (
-      <section key="summary">
-        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5`} style={{ color: theme.primaryColor }}>
+      <section key="summary" className="resume-section break-inside-avoid print:break-inside-avoid">
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor }}>
           Professional Summary
         </h2>
         <p className="text-gray-800 text-justify leading-relaxed">{summary}</p>
@@ -51,28 +53,28 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
   const renderExperience = () => {
     if (visibleSections.experience === false || !experience || experience.length === 0) return null;
     return (
-      <section key="experience">
-        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2`} style={{ color: theme.primaryColor }}>
+      <section key="experience" className="resume-section">
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-2 leading-snug`} style={{ color: theme.primaryColor }}>
           Work Experience
         </h2>
-        <div className="space-y-3">
+        <div className={isSinglePageFit ? 'space-y-2.5' : 'space-y-3.5'}>
           {experience.map((exp) => (
-            <div key={exp.id}>
-              <div className="flex justify-between items-baseline">
-                <div>
+            <div key={exp.id} className="resume-item break-inside-avoid print:break-inside-avoid">
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex-1 min-w-0">
                   <span className="font-bold text-gray-900">{exp.role}</span>
                   <span className="text-gray-700"> — {exp.company}</span>
-                  {exp.location && <span className="text-xs text-gray-500"> ({exp.location})</span>}
+                  {exp.location && <span className="text-xs text-gray-500 whitespace-nowrap"> ({exp.location})</span>}
                 </div>
-                <span className="text-xs text-gray-600 font-medium">
+                <span className="text-xs text-gray-600 font-medium shrink-0 ml-2 whitespace-nowrap text-right">
                   {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
                 </span>
               </div>
               {exp.bullets && exp.bullets.length > 0 && (
-                <ul className="mt-1 space-y-1 text-gray-800">
+                <ul className={`mt-1 text-gray-800 ${isSinglePageFit ? 'space-y-0.5' : 'space-y-1'}`}>
                   {exp.bullets.map((bullet, idx) => (
-                    <li key={idx} className="flex items-start gap-1.5 leading-relaxed">
-                      <span className="text-gray-500 font-bold shrink-0">{bulletIcon}</span>
+                    <li key={idx} className={`flex items-start gap-1.5 ${isSinglePageFit ? 'leading-snug' : 'leading-relaxed'}`}>
+                      <span className="text-gray-500 font-bold shrink-0 mt-0.5">{bulletIcon}</span>
                       <span>{bullet}</span>
                     </li>
                   ))}
@@ -92,11 +94,11 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     const gridColsClass = cols === 3 ? 'grid-cols-1 sm:grid-cols-3' : cols === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1';
 
     return (
-      <section key="skills">
-        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5`} style={{ color: theme.primaryColor }}>
+      <section key="skills" className="resume-section break-inside-avoid print:break-inside-avoid">
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor }}>
           Skills & Competencies
         </h2>
-        <div className={`grid ${gridColsClass} gap-2 text-gray-800`}>
+        <div className={`grid ${gridColsClass} gap-x-4 gap-y-1.5 text-gray-800 leading-snug`}>
           {skills.languages && skills.languages.length > 0 && (
             <div>
               <span className="font-bold text-gray-900">Languages: </span>
@@ -130,32 +132,32 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
   const renderProjects = () => {
     if (visibleSections.projects === false || !projects || projects.length === 0) return null;
     return (
-      <section key="projects">
-        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2`} style={{ color: theme.primaryColor }}>
+      <section key="projects" className="resume-section">
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-2 leading-snug`} style={{ color: theme.primaryColor }}>
           Projects
         </h2>
-        <div className="space-y-2.5">
+        <div className={isSinglePageFit ? 'space-y-2' : 'space-y-2.5'}>
           {projects.map((proj) => (
-            <div key={proj.id}>
-              <div className="flex justify-between items-baseline">
-                <div>
+            <div key={proj.id} className="resume-item break-inside-avoid print:break-inside-avoid">
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex-1 min-w-0">
                   <span className="font-bold text-gray-900">{proj.name}</span>
                   {proj.technologies && proj.technologies.length > 0 && (
                     <span className="text-xs text-gray-600"> | {proj.technologies.join(', ')}</span>
                   )}
                 </div>
                 {proj.url && (
-                  <a href={proj.url} target="_blank" rel="noreferrer" className="text-xs underline text-gray-700">
+                  <a href={proj.url} target="_blank" rel="noreferrer" className="text-xs underline text-gray-700 shrink-0 ml-2 whitespace-nowrap">
                     View Project
                   </a>
                 )}
               </div>
-              {proj.description && <p className="text-xs text-gray-700 mt-0.5">{proj.description}</p>}
+              {proj.description && <p className="text-xs text-gray-700 mt-0.5 leading-snug">{proj.description}</p>}
               {proj.bullets && proj.bullets.length > 0 && (
-                <ul className="mt-1 space-y-0.5 text-gray-800">
+                <ul className={`mt-1 text-gray-800 ${isSinglePageFit ? 'space-y-0.5' : 'space-y-1'}`}>
                   {proj.bullets.map((b, idx) => (
-                    <li key={idx} className="flex items-start gap-1.5">
-                      <span className="text-gray-500 font-bold shrink-0">{bulletIcon}</span>
+                    <li key={idx} className={`flex items-start gap-1.5 ${isSinglePageFit ? 'leading-snug' : 'leading-relaxed'}`}>
+                      <span className="text-gray-500 font-bold shrink-0 mt-0.5">{bulletIcon}</span>
                       <span>{b}</span>
                     </li>
                   ))}
@@ -172,24 +174,24 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
   const renderEducation = () => {
     if (visibleSections.education === false || !education || education.length === 0) return null;
     return (
-      <section key="education">
-        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-2`} style={{ color: theme.primaryColor }}>
+      <section key="education" className="resume-section break-inside-avoid print:break-inside-avoid">
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-2 leading-snug`} style={{ color: theme.primaryColor }}>
           Education
         </h2>
         <div className="space-y-2">
           {education.map((edu) => (
-            <div key={edu.id}>
-              <div className="flex justify-between items-baseline">
-                <div>
+            <div key={edu.id} className="resume-item break-inside-avoid print:break-inside-avoid">
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex-1 min-w-0">
                   <span className="font-bold text-gray-900">{edu.degree} in {edu.fieldOfStudy}</span>
                   <span className="text-gray-700"> — {edu.institution}</span>
-                  {edu.location && <span className="text-xs text-gray-500"> ({edu.location})</span>}
+                  {edu.location && <span className="text-xs text-gray-500 whitespace-nowrap"> ({edu.location})</span>}
                 </div>
-                <span className="text-xs text-gray-600 font-medium">
+                <span className="text-xs text-gray-600 font-medium shrink-0 ml-2 whitespace-nowrap text-right">
                   {edu.startDate} – {edu.endDate}
                 </span>
               </div>
-              {edu.gpa && <p className="text-xs text-gray-600">GPA: {edu.gpa}</p>}
+              {edu.gpa && <p className="text-xs text-gray-600 mt-0.5">GPA: {edu.gpa}</p>}
             </div>
           ))}
         </div>
@@ -201,16 +203,18 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
   const renderCertifications = () => {
     if (visibleSections.certifications === false || !certifications || certifications.length === 0) return null;
     return (
-      <section key="certifications">
-        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5`} style={{ color: theme.primaryColor }}>
+      <section key="certifications" className="resume-section break-inside-avoid print:break-inside-avoid">
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor }}>
           Certifications
         </h2>
-        <ul className="space-y-0.5 text-gray-800">
+        <ul className="space-y-1 text-gray-800">
           {certifications.map((cert) => (
-            <li key={cert.id} className="flex items-start gap-1.5">
-              <span className="text-gray-500 font-bold shrink-0">{bulletIcon}</span>
-              <span>
-                <strong className="font-semibold">{cert.name}</strong> — {cert.issuer} ({cert.date})
+            <li key={cert.id} className="resume-item flex items-start gap-1.5 leading-snug break-inside-avoid print:break-inside-avoid">
+              <span className="text-gray-500 font-bold shrink-0 mt-0.5">{bulletIcon}</span>
+              <span className="flex-1">
+                <strong className="font-semibold text-gray-900">{cert.name}</strong>
+                <span className="text-gray-700"> — {cert.issuer}</span>
+                {cert.date && <span className="text-gray-600 whitespace-nowrap"> ({cert.date})</span>}
               </span>
             </li>
           ))}
@@ -223,16 +227,16 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
   const renderCustomSection = (sec: { id: string; title: string; items: any[] }) => {
     if (visibleSections[sec.id] === false || !sec.items || sec.items.length === 0) return null;
     return (
-      <section key={sec.id}>
-        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b border-gray-800 pb-0.5 mb-1.5`} style={{ color: theme.primaryColor }}>
+      <section key={sec.id} className="resume-section break-inside-avoid print:break-inside-avoid">
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor }}>
           {sec.title}
         </h2>
         <div className="space-y-2">
           {sec.items.map((it: any, idx: number) => (
-            <div key={idx}>
-              <div className="flex justify-between items-baseline">
-                <span className="font-bold text-gray-900">{it.title}</span>
-                {it.date && <span className="text-xs text-gray-600 font-medium">{it.date}</span>}
+            <div key={idx} className="resume-item break-inside-avoid print:break-inside-avoid">
+              <div className="flex justify-between items-start gap-4">
+                <span className="font-bold text-gray-900 flex-1">{it.title}</span>
+                {it.date && <span className="text-xs text-gray-600 font-medium shrink-0 whitespace-nowrap ml-2">{it.date}</span>}
               </div>
               {it.subtitle && <p className="text-xs text-gray-700 italic">{it.subtitle}</p>}
               {it.description && <p className="text-xs text-gray-800 mt-0.5 leading-relaxed">{it.description}</p>}
@@ -268,10 +272,10 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
   return (
     <div 
       style={fontStyle}
-      className={`w-full max-w-[800px] mx-auto bg-white text-gray-900 p-8 shadow-sm ${sizeClasses.body} ${spacingClass} print:p-0 print:shadow-none`}
+      className={`w-full max-w-[800px] mx-auto bg-white text-gray-900 ${isSinglePageFit ? 'py-5 px-6 sm:py-6 sm:px-8' : 'p-7 sm:p-8'} shadow-sm ${sizeClasses.body} ${spacingClass} print:p-0 print:shadow-none`}
     >
       {/* Header */}
-      <header className="flex items-center justify-between border-b pb-3 border-gray-400 gap-4">
+      <header className="flex items-center justify-between border-b pb-2 sm:pb-2.5 border-gray-400 gap-4 mb-1">
         <div className="flex-1 text-center">
           <h1 
             className={`${sizeClasses.h1} font-bold tracking-tight uppercase`}
@@ -282,26 +286,26 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
           {personalInfo.jobTitle && (
             <p className="text-sm font-medium text-gray-700 mt-0.5">{personalInfo.jobTitle}</p>
           )}
-          <div className="flex flex-wrap justify-center items-center gap-x-2 text-xs text-gray-600 mt-1.5">
-            {personalInfo.location && <span>{personalInfo.location}</span>}
-            {personalInfo.phone && <span>• {personalInfo.phone}</span>}
+          <div className="flex flex-wrap justify-center items-center gap-x-2.5 text-xs text-gray-600 mt-1.5">
+            {personalInfo.location && <span className="whitespace-nowrap">{personalInfo.location}</span>}
+            {personalInfo.phone && <span className="whitespace-nowrap">• {personalInfo.phone}</span>}
             {personalInfo.email && (
-              <span>
+              <span className="whitespace-nowrap">
                 • <a href={`mailto:${personalInfo.email}`} className="text-gray-900 underline">{personalInfo.email}</a>
               </span>
             )}
             {personalInfo.linkedin && (
-              <span>
+              <span className="whitespace-nowrap">
                 • <a href={personalInfo.linkedin} target="_blank" rel="noreferrer" className="text-gray-900 underline">LinkedIn</a>
               </span>
             )}
             {personalInfo.github && (
-              <span>
+              <span className="whitespace-nowrap">
                 • <a href={personalInfo.github} target="_blank" rel="noreferrer" className="text-gray-900 underline">GitHub</a>
               </span>
             )}
             {personalInfo.website && (
-              <span>
+              <span className="whitespace-nowrap">
                 • <a href={personalInfo.website} target="_blank" rel="noreferrer" className="text-gray-900 underline">Portfolio</a>
               </span>
             )}

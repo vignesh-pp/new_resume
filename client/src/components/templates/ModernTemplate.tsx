@@ -15,6 +15,8 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
   const sizeClasses = getFontSizeClasses(theme.fontSize);
   const bulletIcon = getBulletIcon(theme.bulletStyle);
 
+  const isSinglePageFit = theme.fitToSinglePage || theme.spacing === 'compact';
+
   const defaultOrder = ['summary', 'experience', 'skills', 'projects', 'education', 'certifications'];
   const baseOrder = (resumeData.sectionOrder && resumeData.sectionOrder.length > 0)
     ? resumeData.sectionOrder
@@ -33,8 +35,8 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
   const renderSummary = () => {
     if (visibleSections.summary === false || !summary) return null;
     return (
-      <section key="summary" className="mt-4">
-        <div className="flex items-center gap-2 mb-2">
+      <section key="summary" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mt-2.5' : 'mt-4'}`}>
+        <div className="flex items-center gap-2 mb-1.5">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
           <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>About Me</h2>
         </div>
@@ -46,31 +48,31 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
   const renderExperience = () => {
     if (visibleSections.experience === false || !experience || experience.length === 0) return null;
     return (
-      <section key="experience" className="mt-4">
-        <div className="flex items-center gap-2 mb-3">
+      <section key="experience" className={`resume-section ${isSinglePageFit ? 'mt-2.5' : 'mt-4'}`}>
+        <div className="flex items-center gap-2 mb-2">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
           <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>Experience</h2>
         </div>
-        <div className="space-y-4 pl-4 border-l-2 border-slate-100">
+        <div className={`pl-4 border-l-2 border-slate-100 ${isSinglePageFit ? 'space-y-2.5' : 'space-y-4'}`}>
           {experience.map((exp) => (
-            <div key={exp.id} className="relative">
-              <div className="flex justify-between items-start">
-                <div>
+            <div key={exp.id} className="relative resume-item break-inside-avoid print:break-inside-avoid">
+              <div className="flex justify-between items-start gap-3">
+                <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-slate-900">{exp.role}</h3>
                   <p className="text-xs font-semibold" style={{ color: theme.primaryColor }}>
-                    {exp.company} {exp.location && <span className="text-slate-400 font-normal">| {exp.location}</span>}
+                    {exp.company} {exp.location && <span className="text-slate-400 font-normal whitespace-nowrap">| {exp.location}</span>}
                   </p>
                 </div>
-                <span className="text-[11px] font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+                <span className="text-[11px] font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded shrink-0 whitespace-nowrap ml-2">
                   {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
                 </span>
               </div>
               {exp.bullets && exp.bullets.length > 0 && (
-                <ul className="mt-2 space-y-1 text-slate-600">
+                <ul className={`mt-1.5 text-slate-600 ${isSinglePageFit ? 'space-y-0.5' : 'space-y-1'}`}>
                   {exp.bullets.map((b, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
+                    <li key={idx} className={`flex items-start gap-2 ${isSinglePageFit ? 'leading-snug' : 'leading-relaxed'}`}>
                       <span className="text-slate-400 font-bold mt-0.5">{bulletIcon}</span>
-                      <span className="leading-relaxed">{b}</span>
+                      <span>{b}</span>
                     </li>
                   ))}
                 </ul>
@@ -129,16 +131,16 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
   const renderProjects = () => {
     if (visibleSections.projects === false || !projects || projects.length === 0) return null;
     return (
-      <section key="projects" className="mt-4">
-        <div className="flex items-center gap-2 mb-3">
+      <section key="projects" className={`resume-section ${isSinglePageFit ? 'mt-2.5' : 'mt-4'}`}>
+        <div className="flex items-center gap-2 mb-2">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
           <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>Featured Projects</h2>
         </div>
-        <div className="space-y-3 pl-4 border-l-2 border-slate-100">
+        <div className={`pl-4 border-l-2 border-slate-100 ${isSinglePageFit ? 'space-y-2' : 'space-y-3'}`}>
           {projects.map((p) => (
-            <div key={p.id}>
-              <div className="flex justify-between items-baseline">
-                <div className="flex items-center gap-2">
+            <div key={p.id} className="resume-item break-inside-avoid print:break-inside-avoid">
+              <div className="flex justify-between items-baseline gap-3">
+                <div className="flex items-center gap-2 flex-1 min-w-0">
                   <span className="font-bold text-slate-900 text-xs">{p.name}</span>
                   {p.technologies && p.technologies.length > 0 && (
                     <span className="text-[11px] text-slate-500 font-normal">
@@ -147,12 +149,12 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
                   )}
                 </div>
                 {p.url && (
-                  <a href={p.url} target="_blank" rel="noreferrer" className="text-xs font-medium hover:underline" style={{ color: theme.primaryColor }}>
+                  <a href={p.url} target="_blank" rel="noreferrer" className="text-xs font-medium hover:underline shrink-0 ml-2 whitespace-nowrap" style={{ color: theme.primaryColor }}>
                     Live Demo ↗
                   </a>
                 )}
               </div>
-              {p.description && <p className="text-slate-600 mt-0.5">{p.description}</p>}
+              {p.description && <p className="text-slate-600 mt-0.5 leading-snug text-xs">{p.description}</p>}
             </div>
           ))}
         </div>
@@ -163,19 +165,19 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
   const renderEducation = () => {
     if (visibleSections.education === false || !education || education.length === 0) return null;
     return (
-      <section key="education" className="mt-4">
-        <div className="flex items-center gap-2 mb-2.5">
+      <section key="education" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mt-2.5' : 'mt-4'}`}>
+        <div className="flex items-center gap-2 mb-2">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
           <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>Education</h2>
         </div>
         <div className="space-y-2 pl-4 border-l-2 border-slate-100">
           {education.map((edu) => (
-            <div key={edu.id} className="flex justify-between items-baseline text-xs">
-              <div>
+            <div key={edu.id} className="flex justify-between items-start text-xs gap-3 resume-item break-inside-avoid print:break-inside-avoid">
+              <div className="flex-1 min-w-0">
                 <span className="font-bold text-slate-900">{edu.degree} in {edu.fieldOfStudy}</span>
                 <span className="text-slate-600"> — {edu.institution}</span>
               </div>
-              <span className="text-slate-500">{edu.startDate} – {edu.endDate}</span>
+              <span className="text-slate-500 shrink-0 ml-2 whitespace-nowrap text-right">{edu.startDate} – {edu.endDate}</span>
             </div>
           ))}
         </div>
@@ -186,16 +188,16 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
   const renderCertifications = () => {
     if (visibleSections.certifications === false || !certifications || certifications.length === 0) return null;
     return (
-      <section key="certifications" className="mt-4">
-        <div className="flex items-center gap-2 mb-2.5">
+      <section key="certifications" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mt-2.5' : 'mt-4'}`}>
+        <div className="flex items-center gap-2 mb-2">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
           <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>Certifications</h2>
         </div>
         <div className="space-y-1.5 pl-4 border-l-2 border-slate-100 text-xs">
           {certifications.map((c) => (
-            <div key={c.id} className="flex justify-between items-baseline">
-              <span className="font-semibold text-slate-800">{c.name}</span>
-              <span className="text-slate-500 text-[11px]">{c.issuer} ({c.date})</span>
+            <div key={c.id} className="flex justify-between items-baseline gap-3 resume-item break-inside-avoid print:break-inside-avoid">
+              <span className="font-semibold text-slate-800 flex-1 min-w-0">{c.name}</span>
+              <span className="text-slate-500 text-[11px] shrink-0 ml-2 whitespace-nowrap">{c.issuer} ({c.date})</span>
             </div>
           ))}
         </div>
@@ -207,20 +209,20 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
   const renderCustomSection = (sec: { id: string; title: string; items: any[] }) => {
     if (visibleSections[sec.id] === false || !sec.items || sec.items.length === 0) return null;
     return (
-      <section key={sec.id} className="mt-4">
+      <section key={sec.id} className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mt-2.5' : 'mt-4'}`}>
         <div className="flex items-center gap-2 mb-2">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
           <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>{sec.title}</h2>
         </div>
-        <div className="space-y-3 pl-4 border-l-2 border-slate-100">
+        <div className="space-y-2.5 pl-4 border-l-2 border-slate-100">
           {sec.items.map((it: any, idx: number) => (
-            <div key={idx}>
-              <div className="flex justify-between items-baseline">
-                <h3 className="font-bold text-slate-900">{it.title}</h3>
-                {it.date && <span className="text-[11px] font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded">{it.date}</span>}
+            <div key={idx} className="resume-item break-inside-avoid print:break-inside-avoid">
+              <div className="flex justify-between items-baseline gap-3">
+                <h3 className="font-bold text-slate-900 flex-1 min-w-0">{it.title}</h3>
+                {it.date && <span className="text-[11px] font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded shrink-0 ml-2 whitespace-nowrap">{it.date}</span>}
               </div>
               {it.subtitle && <p className="text-xs font-semibold" style={{ color: theme.primaryColor }}>{it.subtitle}</p>}
-              {it.description && <p className="text-xs text-slate-600 mt-1 leading-relaxed">{it.description}</p>}
+              {it.description && <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">{it.description}</p>}
             </div>
           ))}
         </div>
@@ -253,13 +255,13 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
   return (
     <div 
       style={fontStyle}
-      className={`w-full max-w-[800px] mx-auto bg-white text-slate-800 p-8 shadow-sm ${sizeClasses.body} print:p-0 print:shadow-none`}
+      className={`w-full max-w-[800px] mx-auto bg-white text-slate-800 ${isSinglePageFit ? 'py-5 px-6 sm:py-6 sm:px-8' : 'p-7 sm:p-8'} shadow-sm ${sizeClasses.body} print:p-0 print:shadow-none`}
     >
       {/* Top accent line */}
-      <div className="h-1.5 w-full rounded-full mb-6" style={{ backgroundColor: theme.primaryColor }} />
+      <div className={`h-1.5 w-full rounded-full ${isSinglePageFit ? 'mb-4' : 'mb-6'}`} style={{ backgroundColor: theme.primaryColor }} />
 
       {/* Modern Header */}
-      <header className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-5 border-b border-slate-200">
+      <header className={`flex flex-col sm:flex-row justify-between items-start gap-4 border-b border-slate-200 ${isSinglePageFit ? 'pb-3' : 'pb-5'}`}>
         <div className="flex items-center gap-4">
           {theme.showPhoto && personalInfo.photoUrl && (
             <img
