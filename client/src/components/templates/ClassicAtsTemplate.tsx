@@ -1,5 +1,6 @@
 import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
+import { useResumeStore } from '../../store/useResumeStore';
 import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
 import { DraggableSection } from '../preview/DraggableSection';
 import { getSectionTitle } from '../../utils/sectionTitles';
@@ -10,6 +11,7 @@ interface TemplateProps {
 }
 
 export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) => {
+  const { focusSection } = useResumeStore();
   const { personalInfo, summary, experience, education, skills, projects, certifications, visibleSections } = resumeData;
 
   const fontStyle = { fontFamily: getFontFamilyCss(theme.fontFamily) };
@@ -43,7 +45,7 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     if (visibleSections.summary === false || !summary) return null;
     return (
       <section key="summary" className="resume-section break-inside-avoid print:break-inside-avoid">
-        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor }}>
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-2 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor, borderColor: theme.primaryColor }}>
           {getSectionTitle(resumeData, 'summary', 'Professional Summary')}
         </h2>
         <p className="text-gray-800 text-justify leading-relaxed">{summary}</p>
@@ -56,7 +58,7 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     if (visibleSections.experience === false || !experience || experience.length === 0) return null;
     return (
       <section key="experience" className="resume-section">
-        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-2 leading-snug`} style={{ color: theme.primaryColor }}>
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-2 pb-0.5 mb-2 leading-snug`} style={{ color: theme.primaryColor, borderColor: theme.primaryColor }}>
           {getSectionTitle(resumeData, 'experience', 'Work Experience')}
         </h2>
         <div className={isSinglePageFit ? 'space-y-2.5' : 'space-y-3.5'}>
@@ -97,7 +99,7 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
 
     return (
       <section key="skills" className="resume-section break-inside-avoid print:break-inside-avoid">
-        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor }}>
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-2 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor, borderColor: theme.primaryColor }}>
           {getSectionTitle(resumeData, 'skills', 'Skills & Competencies')}
         </h2>
         <div className={`grid ${gridColsClass} gap-x-4 gap-y-1.5 text-gray-800 leading-snug`}>
@@ -135,7 +137,7 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     if (visibleSections.projects === false || !projects || projects.length === 0) return null;
     return (
       <section key="projects" className="resume-section">
-        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-2 leading-snug`} style={{ color: theme.primaryColor }}>
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-2 pb-0.5 mb-2 leading-snug`} style={{ color: theme.primaryColor, borderColor: theme.primaryColor }}>
           {getSectionTitle(resumeData, 'projects', 'Projects')}
         </h2>
         <div className={isSinglePageFit ? 'space-y-2' : 'space-y-2.5'}>
@@ -177,7 +179,7 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     if (visibleSections.education === false || !education || education.length === 0) return null;
     return (
       <section key="education" className="resume-section break-inside-avoid print:break-inside-avoid">
-        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-2 leading-snug`} style={{ color: theme.primaryColor }}>
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-2 pb-0.5 mb-2 leading-snug`} style={{ color: theme.primaryColor, borderColor: theme.primaryColor }}>
           {getSectionTitle(resumeData, 'education', 'Education')}
         </h2>
         <div className="space-y-2">
@@ -206,7 +208,7 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     if (visibleSections.certifications === false || !certifications || certifications.length === 0) return null;
     return (
       <section key="certifications" className="resume-section break-inside-avoid print:break-inside-avoid">
-        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor }}>
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-2 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor, borderColor: theme.primaryColor }}>
           {getSectionTitle(resumeData, 'certifications', 'Certifications')}
         </h2>
         <ul className="space-y-1 text-gray-800">
@@ -230,8 +232,8 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     if (visibleSections[sec.id] === false || !sec.items || sec.items.length === 0) return null;
     return (
       <section key={sec.id} className="resume-section break-inside-avoid print:break-inside-avoid">
-        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-[1.5px] border-gray-800 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor }}>
-          {sec.title}
+        <h2 className={`${sizeClasses.h2} font-bold tracking-wider uppercase border-b-2 pb-0.5 mb-1.5 leading-snug`} style={{ color: theme.primaryColor, borderColor: theme.primaryColor }}>
+          {getSectionTitle(resumeData, sec.id, sec.title)}
         </h2>
         <div className="space-y-2">
           {sec.items.map((it: any, idx: number) => (
@@ -277,7 +279,12 @@ export const ClassicAtsTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
       className={`w-full max-w-[800px] mx-auto bg-white text-gray-900 ${isSinglePageFit ? 'py-5 px-6 sm:py-6 sm:px-8' : 'p-7 sm:p-8'} shadow-sm ${sizeClasses.body} ${spacingClass} print:p-0 print:shadow-none`}
     >
       {/* Header */}
-      <header className="flex items-center justify-between border-b pb-2 sm:pb-2.5 border-gray-400 gap-4 mb-1">
+      <header
+        onDoubleClick={() => focusSection('personal')}
+        title="Double-click to edit Personal Information in form"
+        className="flex items-center justify-between border-b-2 pb-2 sm:pb-2.5 gap-4 mb-2 cursor-pointer hover:ring-1 hover:ring-blue-400/40 rounded transition-all"
+        style={{ borderColor: theme.primaryColor }}
+      >
         <div className="flex-1 text-center">
           <h1 
             className={`${sizeClasses.h1} font-bold tracking-tight uppercase`}

@@ -89,6 +89,7 @@ class ResumeSchema(BaseModel):
         "education": True,
         "certifications": True,
     }
+    sectionTitles: Dict[str, str] = {}
 
 class AtsScoreBreakdown(BaseModel):
     overallScore: int

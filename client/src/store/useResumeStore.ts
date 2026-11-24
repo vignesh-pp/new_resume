@@ -5,6 +5,7 @@ import {
   CustomSection, CustomSectionItem 
 } from '../types/resume';
 import { developerResume, executiveResume, designerResume } from '../utils/sampleResumes';
+import { sanitizeResumeData, createEmptyResume } from '../utils/sanitizeResume';
 
 interface ResumeStoreState {
   resumeData: ResumeSchema;
@@ -17,6 +18,23 @@ interface ResumeStoreState {
   showTailorModal: boolean;
   showBulletModal: boolean;
   activeBulletContext: { expId: string; bulletIndex: number; text: string } | null;
+
+  // Track currently active saved resume ID
+  currentResumeId: string | null;
+  currentResumeTitle: string | null;
+  setCurrentResumeId: (id: string | null, title?: string | null) => void;
+  resetResume: () => void;
+
+  // Live Section Focus
+  focusedSection: string | null;
+  focusTimestamp: number;
+  focusSection: (sectionKey: string) => void;
+
+  // Template Preview Modal
+  previewModalTemplate: TemplateId | null;
+  isPreviewModalOpen: boolean;
+  openPreviewModal: (templateId?: TemplateId) => void;
+  closePreviewModal: () => void;
 
   // Actions
   setResumeData: (data: ResumeSchema) => void;
@@ -82,7 +100,38 @@ export const useResumeStore = create<ResumeStoreState>((set) => ({
   showBulletModal: false,
   activeBulletContext: null,
 
-  setResumeData: (data) => set({ resumeData: data }),
+  currentResumeId: null,
+  currentResumeTitle: null,
+  setCurrentResumeId: (id, title = null) => set({ currentResumeId: id, currentResumeTitle: title }),
+  resetResume: () => set({
+    resumeData: createEmptyResume(),
+    currentResumeId: null,
+    currentResumeTitle: null,
+  }),
+
+  focusedSection: null,
+  focusTimestamp: 0,
+  focusSection: (sectionKey) =>
+    set({
+      focusedSection: sectionKey,
+      focusTimestamp: Date.now(),
+      activeTab: 'editor',
+    }),
+
+  previewModalTemplate: null,
+  isPreviewModalOpen: false,
+  openPreviewModal: (templateId) =>
+    set((state) => ({
+      previewModalTemplate: templateId || state.activeTemplate,
+      isPreviewModalOpen: true,
+    })),
+  closePreviewModal: () =>
+    set({
+      isPreviewModalOpen: false,
+      previewModalTemplate: null,
+    }),
+
+  setResumeData: (data) => set({ resumeData: sanitizeResumeData(data) }),
 
   updatePersonalInfo: (info) =>
     set((state) => ({
@@ -254,8 +303,9 @@ export const useResumeStore = create<ResumeStoreState>((set) => ({
 
   addCustomSection: (title = 'Awards & Honors') =>
     set((state) => {
+      const newSecId = 'custom-' + Date.now();
       const newSec: CustomSection = {
-        id: 'custom-' + Date.now(),
+        id: newSecId,
         title,
         items: [
           {
@@ -272,10 +322,14 @@ export const useResumeStore = create<ResumeStoreState>((set) => ({
         resumeData: {
           ...state.resumeData,
           customSections: [...existing, newSec],
-          sectionOrder: [...order, newSec.id],
+          sectionOrder: [...order, newSecId],
+          sectionTitles: {
+            ...(state.resumeData.sectionTitles || {}),
+            [newSecId]: title,
+          },
           visibleSections: {
             ...state.resumeData.visibleSections,
-            [newSec.id]: true,
+            [newSecId]: true,
           },
         },
       };
@@ -288,6 +342,12 @@ export const useResumeStore = create<ResumeStoreState>((set) => ({
         customSections: (state.resumeData.customSections || []).map((sec) =>
           sec.id === id ? { ...sec, ...updated } : sec
         ),
+        sectionTitles: updated.title
+          ? {
+              ...(state.resumeData.sectionTitles || {}),
+              [id]: updated.title,
+            }
+          : state.resumeData.sectionTitles,
       },
     })),
 
@@ -349,6 +409,9 @@ export const useResumeStore = create<ResumeStoreState>((set) => ({
           ...(state.resumeData.sectionTitles || {}),
           [sectionKey]: title,
         },
+        customSections: (state.resumeData.customSections || []).map((sec) =>
+          sec.id === sectionKey ? { ...sec, title } : sec
+        ),
       },
     })),
 

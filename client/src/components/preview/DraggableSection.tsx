@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useResumeStore } from '../../store/useResumeStore';
-import { GripVertical, ArrowUp, ArrowDown, EyeOff, Edit3, Check } from 'lucide-react';
+import { GripVertical, ArrowUp, ArrowDown, EyeOff, Edit3, Check, ExternalLink } from 'lucide-react';
 
 interface DraggableSectionProps {
   sectionId: string;
@@ -26,7 +26,14 @@ export const DraggableSection: React.FC<DraggableSectionProps> = ({
   total = 1,
   customLabel,
 }) => {
-  const { resumeData, moveSectionOrder, moveSectionToPosition, toggleSectionVisibility, updateSectionTitle } = useResumeStore();
+  const {
+    resumeData,
+    moveSectionOrder,
+    moveSectionToPosition,
+    toggleSectionVisibility,
+    updateSectionTitle,
+    focusSection,
+  } = useResumeStore();
 
   const [isDragging, setIsDragging] = useState(false);
   const [dropIndicator, setDropIndicator] = useState<'top' | 'bottom' | null>(null);
@@ -42,6 +49,12 @@ export const DraggableSection: React.FC<DraggableSectionProps> = ({
     DEFAULT_LABELS[sectionId] ||
     resumeData.customSections?.find((s) => s.id === sectionId)?.title ||
     sectionId;
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    if (isEditingTitle) return;
+    e.stopPropagation();
+    focusSection(sectionId);
+  };
 
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData('text/plain', sectionId);
@@ -93,7 +106,9 @@ export const DraggableSection: React.FC<DraggableSectionProps> = ({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`group relative transition-all duration-150 ${
+      onDoubleClick={handleDoubleClick}
+      title={`Double-click to edit ${label} in form`}
+      className={`group relative transition-all duration-150 cursor-pointer ${
         isDragging ? 'opacity-30 border-2 border-dashed border-blue-400 rounded-lg p-1' : ''
       }`}
     >
@@ -178,6 +193,20 @@ export const DraggableSection: React.FC<DraggableSectionProps> = ({
               title="Rename section heading"
             >
               <Edit3 className="w-3 h-3 text-slate-400 hover:text-cyan-300" />
+            </button>
+
+            {/* Jump to Form Edit */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                focusSection(sectionId);
+              }}
+              className="p-0.5 hover:text-emerald-300 transition-colors flex items-center gap-0.5 text-[10px] text-emerald-400 font-semibold"
+              title={`Edit ${label} in form`}
+            >
+              <ExternalLink className="w-3 h-3 text-emerald-400" />
+              <span>Edit</span>
             </button>
           </>
         )}

@@ -95,7 +95,8 @@ export type TemplateId =
   | 'executive'
   | 'creative'
   | 'technical'
-  | 'academic';
+  | 'academic'
+  | (string & {});
 
 export type FontOption = 
   | 'Inter' 

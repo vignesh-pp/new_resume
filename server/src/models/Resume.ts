@@ -1,6 +1,9 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IResume extends Document {
+  userId?: string;
+  userEmail?: string;
+  userName?: string;
   title: string;
   templateId: string;
   theme: {
@@ -29,6 +32,9 @@ export interface IResume extends Document {
 
 const ResumeSchema: Schema = new Schema(
   {
+    userId: { type: String, default: 'usr-alex-1', index: true },
+    userEmail: { type: String, default: '' },
+    userName: { type: String, default: '' },
     title: { type: String, default: 'Untitled Resume' },
     templateId: { type: String, default: 'classic-ats' },
     theme: {

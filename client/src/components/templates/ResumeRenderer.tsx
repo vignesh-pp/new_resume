@@ -7,6 +7,7 @@ import { ExecutiveTemplate } from './ExecutiveTemplate';
 import { CreativeTemplate } from './CreativeTemplate';
 import { TechnicalTemplate } from './TechnicalTemplate';
 import { AcademicTemplate } from './AcademicTemplate';
+import { useTemplateStore } from '../../store/useTemplateStore';
 
 interface ResumeRendererProps {
   templateId: TemplateId;
@@ -19,7 +20,10 @@ export const ResumeRenderer: React.FC<ResumeRendererProps> = ({
   resumeData,
   theme,
 }) => {
-  switch (templateId) {
+  const getBaseLayout = useTemplateStore((state) => state.getBaseLayout);
+  const resolvedLayout = getBaseLayout(templateId);
+
+  switch (resolvedLayout) {
     case 'classic-ats':
       return <ClassicAtsTemplate resumeData={resumeData} theme={theme} />;
     case 'modern-pro':
@@ -38,4 +42,3 @@ export const ResumeRenderer: React.FC<ResumeRendererProps> = ({
       return <ClassicAtsTemplate resumeData={resumeData} theme={theme} />;
   }
 };
-

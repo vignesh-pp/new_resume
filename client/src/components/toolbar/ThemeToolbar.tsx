@@ -1,6 +1,6 @@
 import React from 'react';
 import { useResumeStore } from '../../store/useResumeStore';
-import { TEMPLATES_CONFIG } from '../../utils/templateDefinitions';
+import { useTemplateStore } from '../../store/useTemplateStore';
 import { 
   Palette, LayoutTemplate, Sparkles, Upload, 
   FolderOpen, ArrowUpDown, Sliders, ChevronDown 
@@ -33,7 +33,8 @@ export const ThemeToolbar: React.FC<ThemeToolbarProps> = ({
     isAnalyzing,
   } = useResumeStore();
 
-  const currentTemplate = TEMPLATES_CONFIG.find((t) => t.id === activeTemplate) || TEMPLATES_CONFIG[0];
+  const allTemplates = useTemplateStore((state) => state.allTemplates);
+  const currentTemplate = allTemplates.find((t) => t.id === activeTemplate) || allTemplates[0];
 
   const colorPresets = [
     { name: 'Corporate Blue', hex: '#1e3a8a' },
@@ -62,18 +63,18 @@ export const ThemeToolbar: React.FC<ThemeToolbarProps> = ({
             <span>Rearrange</span>
           </button>
 
-          {/* 2. Templates - Visual Modal Trigger with Green Pill (Matching Reference) */}
+          {/* 2. Templates - Visual Modal Trigger with Blue Pill */}
           <button
             onClick={onOpenTemplateModal}
-            className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex items-center gap-1.5 shadow-xs"
+            className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white hover:bg-blue-700 transition-all flex items-center gap-1.5 shadow-xs"
             title="Select a resume template from 7 visual designs"
           >
             <LayoutTemplate className="w-3.5 h-3.5" />
             <span>Templates</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-800/80 text-emerald-100 font-medium">
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-blue-800/80 text-blue-100 font-medium">
               {currentTemplate.name.split(' ')[0]}
             </span>
-            <ChevronDown className="w-3 h-3 text-emerald-200" />
+            <ChevronDown className="w-3 h-3 text-blue-200" />
           </button>
 
           {/* 3. Design & Font */}

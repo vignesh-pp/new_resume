@@ -3,7 +3,7 @@ import { useResumeStore } from '../../store/useResumeStore';
 import { ResumeRenderer } from '../templates/ResumeRenderer';
 import { 
   ZoomIn, ZoomOut, RotateCcw, Printer, Download, 
-  FileText, Sparkles, Move 
+  FileText, Sparkles, Move, Eye 
 } from 'lucide-react';
 
 interface ResumePreviewProps {
@@ -19,7 +19,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
   onDownloadPdf,
   onDownloadDocx,
 }) => {
-  const { resumeData, activeTemplate, theme, zoom, setZoom, setTheme } = useResumeStore();
+  const { resumeData, activeTemplate, theme, zoom, setZoom, setTheme, openPreviewModal } = useResumeStore();
   const printRef = useRef<HTMLDivElement>(null);
 
   const handleZoomIn = () => setZoom(Math.min(1.4, Number((zoom + 0.1).toFixed(1))));
@@ -46,12 +46,12 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
             onClick={() => setTheme({ fitToSinglePage: !theme.fitToSinglePage })}
             className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-2xs ${
               theme.fitToSinglePage
-                ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
+                ? 'border-blue-300 bg-blue-50 text-blue-800'
                 : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
             }`}
             title="Automatically optimize spacing, margins and line-heights to fit cleanly on 1 page"
           >
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
             <span>{theme.fitToSinglePage ? '1-Page Fit: ON' : '1-Page Fit: OFF'}</span>
           </button>
 
@@ -60,13 +60,23 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
             onClick={() => setTheme({ showPageBreakGuide: !theme.showPageBreakGuide })}
             className={`px-2 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors shadow-2xs ${
               theme.showPageBreakGuide
-                ? 'border-emerald-300 bg-emerald-50 text-emerald-800 font-semibold'
+                ? 'border-blue-300 bg-blue-50 text-blue-800 font-semibold'
                 : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
             }`}
             title="Toggle 1-page A4 cutoff guide"
           >
             <FileText className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">A4 Line</span>
+          </button>
+
+          {/* Full Template Preview in Modal */}
+          <button
+            onClick={() => openPreviewModal(activeTemplate)}
+            className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 hover:text-blue-700 hover:bg-blue-50/50 hover:border-blue-200 transition-colors flex items-center gap-1.5 text-xs font-semibold shadow-2xs"
+            title="Open interactive template preview modal"
+          >
+            <Eye className="w-3.5 h-3.5 text-blue-600" />
+            <span className="hidden sm:inline">Preview Modal</span>
           </button>
         </div>
 

@@ -2,6 +2,9 @@ import React, { useState, useRef } from 'react';
 import { useResumeStore } from '../../store/useResumeStore';
 import { X, Upload, FileText, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 import axios from 'axios';
+import { isLiveApiEnabled } from '../../config/env';
+import { parseResumeClientSide } from '../../utils/clientResumeParser';
+import { sanitizeResumeData } from '../../utils/sanitizeResume';
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -73,17 +76,34 @@ export const UploadModal: React.FC<UploadModalProps> = ({
     setUploading(true);
     setError(null);
 
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-
     try {
-      const resp = await axios.post('/api/ai/parse-upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        timeout: 45000,
-      });
+      let parsedData: any = null;
 
-      if (resp.data?.success && resp.data.data) {
-        setResumeData(resp.data.data);
+      if (isLiveApiEnabled()) {
+        try {
+          const formData = new FormData();
+          formData.append('file', selectedFile);
+
+          const resp = await axios.post('/api/ai/parse-upload', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            timeout: 30000,
+          });
+
+          if (resp.data?.success && resp.data.data) {
+            parsedData = resp.data.data;
+          }
+        } catch (apiErr) {
+          console.warn('Live API parser unreachable or failed, using client parser fallback:', apiErr);
+        }
+      }
+
+      // If live API was disabled or failed, parse client-side
+      if (!parsedData) {
+        parsedData = await parseResumeClientSide(selectedFile);
+      }
+
+      if (parsedData) {
+        setResumeData(sanitizeResumeData(parsedData));
         setActiveTab('editor');
         onClose();
         // Trigger ATS analysis on newly parsed resume
@@ -91,12 +111,12 @@ export const UploadModal: React.FC<UploadModalProps> = ({
           onAnalysisTrigger();
         }, 400);
       } else {
-        throw new Error(resp.data?.error || 'Extraction failed');
+        throw new Error('Could not parse resume data');
       }
     } catch (err: any) {
       console.error('Upload failed:', err);
       setError(
-        err.response?.data?.error || err.message || 'Failed to process document with AI service.'
+        err?.message || 'Failed to process document. Please check the file format.'
       );
     } finally {
       setUploading(false);

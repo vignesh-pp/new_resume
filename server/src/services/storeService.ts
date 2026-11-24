@@ -4,6 +4,9 @@ import crypto from 'crypto';
 
 interface InMemoryResume {
   _id: string;
+  userId?: string;
+  userEmail?: string;
+  userName?: string;
   title: string;
   templateId: string;
   theme: any;
@@ -53,6 +56,9 @@ export const storeService = {
     const id = crypto.randomUUID();
     const item: InMemoryResume = {
       _id: id,
+      userId: data.userId || 'usr-alex-1',
+      userEmail: data.userEmail || '',
+      userName: data.userName || '',
       title: data.title || 'Untitled Resume',
       templateId: data.templateId || 'classic-ats',
       theme: data.theme || { primary: '#0f172a' },

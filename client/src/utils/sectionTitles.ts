@@ -65,5 +65,9 @@ export function getSectionTitle(
   if (resumeData.sectionTitles && resumeData.sectionTitles[sectionKey]?.trim()) {
     return resumeData.sectionTitles[sectionKey].trim();
   }
+  const customSec = (resumeData.customSections || []).find((s) => s.id === sectionKey);
+  if (customSec?.title?.trim()) {
+    return customSec.title.trim();
+  }
   return fallbackTitle || DEFAULT_SECTION_TITLES[sectionKey] || sectionKey;
 }

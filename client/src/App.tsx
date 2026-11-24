@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useResumeStore } from './store/useResumeStore';
+import { useAuthStore } from './store/useAuthStore';
+import { useTemplateStore } from './store/useTemplateStore';
 import { Navbar } from './components/common/Navbar';
 import { ThemeToolbar } from './components/toolbar/ThemeToolbar';
 import { ResumeEditor } from './components/editor/ResumeEditor';
@@ -13,6 +15,11 @@ import { FontPickerModal } from './components/toolbar/FontPickerModal';
 import { ResumeVersionsModal } from './components/versions/ResumeVersionsModal';
 import { LayoutManagerModal } from './components/toolbar/LayoutManagerModal';
 import { TemplatePickerModal } from './components/toolbar/TemplatePickerModal';
+import { TemplatePreviewModal } from './components/preview/TemplatePreviewModal';
+import { AuthModal } from './components/auth/AuthModal';
+import { MyResumesModal } from './components/resumes/MyResumesModal';
+import { AdminTemplateManagerModal } from './components/admin/AdminTemplateManagerModal';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { exportUtils } from './utils/exportUtils';
 import axios from 'axios';
 
@@ -26,12 +33,15 @@ export function App() {
     setShowTailorModal,
   } = useResumeStore();
 
+  const openAdminModal = useTemplateStore((state) => state.openAdminModal);
+
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isAtsModalOpen, setIsAtsModalOpen] = useState(false);
   const [isFontModalOpen, setIsFontModalOpen] = useState(false);
   const [isVersionsModalOpen, setIsVersionsModalOpen] = useState(false);
   const [isLayoutModalOpen, setIsLayoutModalOpen] = useState(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [isMyResumesModalOpen, setIsMyResumesModalOpen] = useState(false);
 
   // Trigger ATS analysis
   const runAtsAnalysis = async () => {
@@ -94,6 +104,8 @@ export function App() {
             runAtsAnalysis();
             setIsAtsModalOpen(true);
           }}
+          onOpenMyResumes={() => setIsMyResumesModalOpen(true)}
+          onOpenAdminTemplates={() => openAdminModal()}
         />
       </div>
 
@@ -177,6 +189,15 @@ export function App() {
 
       <BulletEnhancerModal />
       <JobTailorModal />
+      <TemplatePreviewModal />
+
+      {/* User Auth, Resumes, and Admin Modals */}
+      <AuthModal />
+      <MyResumesModal
+        isOpen={isMyResumesModalOpen}
+        onClose={() => setIsMyResumesModalOpen(false)}
+      />
+      <AdminTemplateManagerModal />
     </div>
   );
 }

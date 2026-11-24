@@ -1,5 +1,6 @@
 import React from 'react';
 import { TemplateId } from '../../types/resume';
+import { useTemplateStore } from '../../store/useTemplateStore';
 
 interface TemplateThumbnailProps {
   templateId: TemplateId | string;
@@ -10,7 +11,12 @@ export const TemplateThumbnail: React.FC<TemplateThumbnailProps> = ({
   templateId,
   primaryColor = '#1e3a8a',
 }) => {
-  switch (templateId) {
+  const getBaseLayout = useTemplateStore((state) => state.getBaseLayout);
+  const layout = ['classic-ats', 'modern-pro', 'minimalist', 'executive', 'creative', 'technical', 'academic'].includes(templateId)
+    ? templateId
+    : getBaseLayout(templateId as any);
+
+  switch (layout) {
     case 'classic-ats':
       return (
         <div className="w-full h-full bg-white p-2.5 flex flex-col justify-between text-[7px] select-none font-serif text-slate-800 leading-tight">

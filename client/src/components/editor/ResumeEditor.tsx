@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useResumeStore } from '../../store/useResumeStore';
 import { 
   User, Briefcase, GraduationCap, Wrench, FolderGit2, Award, 
@@ -39,12 +39,42 @@ export const ResumeEditor: React.FC = () => {
     toggleSectionVisibility,
     setShowBulletModal,
     setActiveBulletContext,
+    focusedSection,
+    focusTimestamp,
   } = useResumeStore();
 
   const [viewMode, setViewMode] = useState<'focused' | 'all'>('focused');
   const [activeSection, setActiveSection] = useState<string>('personal');
   const [expandedSection, setExpandedSection] = useState<string>('personal');
   const [generatingSummary, setGeneratingSummary] = useState(false);
+
+  // Respond to on-canvas section double-clicks from preview
+  useEffect(() => {
+    if (!focusedSection) return;
+
+    const standardKeys = ['personal', 'summary', 'experience', 'skills', 'projects', 'education', 'certifications', 'custom'];
+    const targetTab = standardKeys.includes(focusedSection) ? focusedSection : 'custom';
+
+    setActiveSection(targetTab);
+    setExpandedSection(targetTab);
+
+    const timer = setTimeout(() => {
+      const targetElementId = standardKeys.includes(focusedSection)
+        ? `editor-section-${focusedSection}`
+        : 'editor-section-custom';
+
+      const el = document.getElementById(targetElementId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ring-4', 'ring-blue-500/50', 'shadow-lg');
+        setTimeout(() => {
+          el.classList.remove('ring-4', 'ring-blue-500/50', 'shadow-lg');
+        }, 1800);
+      }
+    }, 80);
+
+    return () => clearTimeout(timer);
+  }, [focusedSection, focusTimestamp]);
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? '' : section);
@@ -1254,42 +1284,53 @@ export const ResumeEditor: React.FC = () => {
               </div>
 
               {/* Custom section items list */}
-              {customSections.map((sec) => (
-                <div key={sec.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
-                  <div className="flex items-center justify-between gap-2 border-b border-slate-200 pb-2">
-                    <div className="flex-1 flex items-center gap-2">
-                      <Layers className="w-4 h-4 text-indigo-600 shrink-0" />
-                      <input
-                        type="text"
-                        value={sec.title}
-                        onChange={(e) => updateCustomSection(sec.id, { title: e.target.value })}
-                        placeholder="Section Title (e.g. Awards & Honors)"
-                        className="font-bold text-xs text-slate-900 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:outline-none px-1 py-0.5"
-                      />
+              {customSections.map((sec) => {
+                const currentSecTitle = resumeData.sectionTitles?.[sec.id] ?? sec.title;
+                return (
+                  <div key={sec.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
+                    <div className="flex items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
+                      <div className="flex-1 flex items-center gap-2">
+                        <Layers className="w-4 h-4 text-indigo-600 shrink-0 mt-3" />
+                        <div className="flex-1">
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">
+                            Section Heading:
+                          </label>
+                          <input
+                            type="text"
+                            value={currentSecTitle}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              updateCustomSection(sec.id, { title: v });
+                              updateSectionTitle(sec.id, v);
+                            }}
+                            placeholder="Section Title (e.g. Awards & Honors)"
+                            className="w-full max-w-sm px-2.5 py-1 text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-2xs"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5 pt-3">
+                        <button
+                          type="button"
+                          onClick={() => toggleSectionVisibility(sec.id)}
+                          className="p-1 text-slate-400 hover:text-slate-600 rounded"
+                          title="Toggle Visibility"
+                        >
+                          {visibleSections[sec.id] !== false ? (
+                            <Eye className="w-4 h-4 text-indigo-600" />
+                          ) : (
+                            <EyeOff className="w-4 h-4" />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeCustomSection(sec.id)}
+                          className="p-1 text-rose-500 hover:bg-rose-50 rounded"
+                          title="Delete Section"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => toggleSectionVisibility(sec.id)}
-                        className="p-1 text-slate-400 hover:text-slate-600 rounded"
-                        title="Toggle Visibility"
-                      >
-                        {visibleSections[sec.id] !== false ? (
-                          <Eye className="w-4 h-4 text-indigo-600" />
-                        ) : (
-                          <EyeOff className="w-4 h-4" />
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => removeCustomSection(sec.id)}
-                        className="p-1 text-rose-500 hover:bg-rose-50 rounded"
-                        title="Delete Section"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
 
                   {/* Items in this custom section */}
                   <div className="space-y-2.5">
@@ -1344,7 +1385,8 @@ export const ResumeEditor: React.FC = () => {
                     </button>
                   </div>
                 </div>
-              ))}
+              );
+            })}
 
               <button
                 type="button"

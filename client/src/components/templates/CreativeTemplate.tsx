@@ -1,5 +1,6 @@
 import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
+import { useResumeStore } from '../../store/useResumeStore';
 import { Mail, Phone, MapPin, Globe, Linkedin, Github } from 'lucide-react';
 import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
 import { DraggableSection } from '../preview/DraggableSection';
@@ -11,6 +12,7 @@ interface TemplateProps {
 }
 
 export const CreativeTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) => {
+  const { focusSection } = useResumeStore();
   const { personalInfo, summary, experience, education, skills, projects, certifications, visibleSections } = resumeData;
 
   const fontStyle = { fontFamily: getFontFamilyCss(theme.fontFamily) };
@@ -27,7 +29,11 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
       {/* Left Sidebar (35%) */}
       <aside className={`w-full sm:w-[35%] bg-slate-900 text-slate-100 ${isSinglePageFit ? 'p-4 sm:p-5 gap-4' : 'p-6 gap-6'} flex flex-col`}>
         {/* Profile Circle / Initials / Photo */}
-        <div className="flex flex-col items-center sm:items-start">
+        <div
+          onDoubleClick={() => focusSection('personal')}
+          title="Double-click to edit Personal Information in form"
+          className="flex flex-col items-center sm:items-start cursor-pointer hover:ring-1 hover:ring-indigo-400/50 rounded-lg p-1 transition-all"
+        >
           {theme.showPhoto !== false && personalInfo.photoUrl ? (
             <img
               src={personalInfo.photoUrl}
@@ -240,10 +246,10 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resumeData, theme })
         {(resumeData.customSections || []).map((sec) => {
           if (visibleSections[sec.id] === false || !sec.items?.length) return null;
           return (
-            <DraggableSection key={sec.id} sectionId={sec.id} customLabel={sec.title}>
+            <DraggableSection key={sec.id} sectionId={sec.id} customLabel={getSectionTitle(resumeData, sec.id, sec.title)}>
               <section className="resume-section">
                 <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-0.5 mb-2 leading-snug`} style={{ borderColor: theme.primaryColor }}>
-                  {sec.title}
+                  {getSectionTitle(resumeData, sec.id, sec.title)}
                 </h2>
                 <div className="space-y-2">
                   {sec.items.map((it, idx) => (

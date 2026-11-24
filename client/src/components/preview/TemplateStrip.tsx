@@ -1,11 +1,12 @@
 import React from 'react';
 import { useResumeStore } from '../../store/useResumeStore';
-import { TEMPLATES_CONFIG } from '../../utils/templateDefinitions';
+import { useTemplateStore } from '../../store/useTemplateStore';
 import { TemplateId } from '../../types/resume';
 import { Check, ShieldCheck, Sparkles } from 'lucide-react';
 
 export const TemplateStrip: React.FC = () => {
   const { activeTemplate, setTemplate } = useResumeStore();
+  const allTemplates = useTemplateStore((state) => state.allTemplates);
 
   return (
     <div className="bg-white border-b border-slate-200 px-4 py-2.5 overflow-x-auto flex items-center gap-3 no-scrollbar z-10">
@@ -15,7 +16,7 @@ export const TemplateStrip: React.FC = () => {
       </div>
 
       <div className="flex items-center gap-2.5">
-        {TEMPLATES_CONFIG.map((t) => {
+        {allTemplates.map((t) => {
           const isSelected = activeTemplate === t.id;
 
           return (

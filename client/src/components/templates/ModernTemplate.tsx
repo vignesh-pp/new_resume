@@ -1,5 +1,6 @@
 import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
+import { useResumeStore } from '../../store/useResumeStore';
 import { Mail, Phone, MapPin, Globe, Linkedin, Github } from 'lucide-react';
 import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
 import { DraggableSection } from '../preview/DraggableSection';
@@ -11,6 +12,7 @@ interface TemplateProps {
 }
 
 export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) => {
+  const { focusSection } = useResumeStore();
   const { personalInfo, summary, experience, education, skills, projects, certifications, visibleSections } = resumeData;
 
   const fontStyle = { fontFamily: getFontFamilyCss(theme.fontFamily) };
@@ -226,7 +228,9 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
       <section key={sec.id} className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mt-2.5' : 'mt-4'}`}>
         <div className="flex items-center gap-2 mb-2">
           <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: theme.primaryColor }} />
-          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>{sec.title}</h2>
+          <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900`}>
+            {getSectionTitle(resumeData, sec.id, sec.title)}
+          </h2>
         </div>
         <div className="space-y-2.5 pl-4 border-l-2 border-slate-100">
           {sec.items.map((it: any, idx: number) => (
@@ -275,7 +279,11 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) =
       <div className={`h-1.5 w-full rounded-full ${isSinglePageFit ? 'mb-4' : 'mb-6'}`} style={{ backgroundColor: theme.primaryColor }} />
 
       {/* Modern Header */}
-      <header className={`flex flex-col sm:flex-row justify-between items-start gap-4 border-b border-slate-200 ${isSinglePageFit ? 'pb-3' : 'pb-5'}`}>
+      <header
+        onDoubleClick={() => focusSection('personal')}
+        title="Double-click to edit Personal Information in form"
+        className={`flex flex-col sm:flex-row justify-between items-start gap-4 border-b border-slate-200 cursor-pointer hover:ring-1 hover:ring-blue-400/40 rounded transition-all ${isSinglePageFit ? 'pb-3' : 'pb-5'}`}
+      >
         <div className="flex items-center gap-4">
           {theme.showPhoto && personalInfo.photoUrl && (
             <img

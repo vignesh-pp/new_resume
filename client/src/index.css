@@ -98,7 +98,8 @@
     max-width: 210mm !important;
     min-height: 297mm !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 10mm 12mm !important;
+    box-sizing: border-box !important;
     background: #ffffff !important;
     box-shadow: none !important;
     border: none !important;
@@ -106,13 +107,13 @@
     z-index: 999999 !important;
   }
 
-  /* Prevent awkward page breaks */
+  /* Smart print page breaks */
   .resume-section {
-    break-inside: avoid !important;
-    page-break-inside: avoid !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
   }
 
-  .resume-item {
+  .resume-item, li, p {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }

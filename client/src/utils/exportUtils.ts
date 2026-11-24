@@ -59,17 +59,47 @@ export const exportUtils = {
 
       // Multi-page smart boundary slicing:
       // Prevents text lines, bullet points, and section headers from being sliced horizontally in half
-      const breakNodes = Array.from(element.querySelectorAll('.resume-section, .resume-item, h2, h3'));
       const rootRect = element.getBoundingClientRect();
-      const nodeOffsetsPx = breakNodes.map((node) => {
-        const rect = node.getBoundingClientRect();
-        return {
-          top: (rect.top - rootRect.top) * scale,
-          bottom: (rect.bottom - rootRect.top) * scale,
-        };
-      });
+      const rawNodes = Array.from(
+        element.querySelectorAll(
+          '.resume-section, .resume-item, li, p, h1, h2, h3, header, .grid > div'
+        )
+      );
 
-      const pageHeightCanvas = (canvas.width * (pdfHeight / pdfWidth));
+      interface NodeBox {
+        tag: string;
+        isHeading: boolean;
+        isAtomic: boolean;
+        top: number;
+        bottom: number;
+      }
+
+      const nodeBoxes: NodeBox[] = rawNodes
+        .map((node) => {
+          const rect = node.getBoundingClientRect();
+          const tag = node.tagName.toLowerCase();
+          const isHeading = tag === 'h1' || tag === 'h2' || tag === 'h3';
+          const isAtomic = isHeading || tag === 'li' || tag === 'p';
+          return {
+            tag,
+            isHeading,
+            isAtomic,
+            top: (rect.top - rootRect.top) * scale,
+            bottom: (rect.bottom - rootRect.top) * scale,
+          };
+        })
+        .filter((n) => n.bottom > n.top + 1);
+
+      // Page geometry in canvas pixels
+      const page1BottomMarginMm = 10;
+      const page1MaxHeightMm = pdfHeight - page1BottomMarginMm;
+      const page1MaxHeightCanvas = (page1MaxHeightMm / mmPerPx) * scale;
+
+      const pageNTopMarginMm = 10;
+      const pageNBottomMarginMm = 10;
+      const pageNUsableHeightMm = pdfHeight - pageNTopMarginMm - pageNBottomMarginMm;
+      const pageNMaxHeightCanvas = (pageNUsableHeightMm / mmPerPx) * scale;
+
       let currentCanvasY = 0;
       let pageIndex = 0;
 
@@ -79,55 +109,102 @@ export const exportUtils = {
         }
 
         const remainingHeight = canvas.height - currentCanvasY;
+        const maxPageCanvasH = pageIndex === 0 ? page1MaxHeightCanvas : pageNMaxHeightCanvas;
+        const topOffsetMm = pageIndex === 0 ? 0 : pageNTopMarginMm;
 
         // If remaining content fits comfortably on the current page:
-        if (remainingHeight <= pageHeightCanvas + 15) {
+        if (remainingHeight <= maxPageCanvasH + 15) {
           const sliceCanvas = document.createElement('canvas');
           sliceCanvas.width = canvas.width;
           sliceCanvas.height = remainingHeight;
           const ctx = sliceCanvas.getContext('2d');
           if (ctx) {
-            ctx.drawImage(canvas, 0, currentCanvasY, canvas.width, remainingHeight, 0, 0, canvas.width, remainingHeight);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, remainingHeight);
+            ctx.drawImage(
+              canvas,
+              0, currentCanvasY, canvas.width, remainingHeight,
+              0, 0, canvas.width, remainingHeight
+            );
             const sliceData = sliceCanvas.toDataURL('image/png');
             const sliceHeightMm = (remainingHeight / scale) * mmPerPx;
-            pdf.addImage(sliceData, 'PNG', 0, 0, pdfWidth, sliceHeightMm);
+            pdf.addImage(sliceData, 'PNG', 0, topOffsetMm, pdfWidth, sliceHeightMm);
           }
           break;
         }
 
-        // Find the best split boundary before pageHeightCanvas:
-        const targetCutY = currentCanvasY + pageHeightCanvas;
-        let bestCutY = targetCutY;
+        // Find the best split boundary before targetCutY
+        const targetCutY = currentCanvasY + maxPageCanvasH;
+        const minCutY = currentCanvasY + 100 * scale;
 
-        const candidates = nodeOffsetsPx.filter(
-          (n) => n.bottom > currentCanvasY && n.bottom <= targetCutY
-        );
+        // Collect potential safe cut positions
+        const cutCandidates: number[] = [];
+        nodeBoxes.forEach((n) => {
+          if (n.bottom >= minCutY && n.bottom <= targetCutY) {
+            cutCandidates.push(n.bottom + 3 * scale);
+          }
+          if (n.top >= minCutY && n.top <= targetCutY) {
+            cutCandidates.push(n.top - 3 * scale);
+          }
+        });
 
-        if (candidates.length > 0) {
-          const lastCandidate = candidates[candidates.length - 1];
-          bestCutY = Math.min(targetCutY, lastCandidate.bottom + 6 * scale);
-        } else {
-          const startCandidates = nodeOffsetsPx.filter(
-            (n) => n.top > currentCanvasY + 60 * scale && n.top <= targetCutY
+        // Filter candidates that do not cut through atomic elements or cause orphan headings
+        const validCandidates = cutCandidates.filter((candY) => {
+          if (candY < minCutY || candY > targetCutY) return false;
+
+          // 1. Must NOT cut through any atomic element (li, p, h1, h2, h3)
+          const cutsAtomic = nodeBoxes.some(
+            (nb) => nb.isAtomic && candY > nb.top + 1 && candY < nb.bottom - 1
           );
-          if (startCandidates.length > 0) {
-            bestCutY = startCandidates[0].top - 4 * scale;
+          if (cutsAtomic) return false;
+
+          // 2. Orphan heading prevention: check if cut is right after a heading with no following content
+          const prevHeadings = nodeBoxes.filter(
+            (nb) => nb.isHeading && nb.bottom <= candY && candY - nb.bottom < 35 * scale
+          );
+          if (prevHeadings.length > 0) {
+            return false;
+          }
+
+          return true;
+        });
+
+        let bestCutY: number;
+        if (validCandidates.length > 0) {
+          // Choose candidate closest to targetCutY to maximize page utilization
+          bestCutY = Math.max(...validCandidates);
+        } else {
+          // Fallback: look for a heading or item starting near targetCutY and cut before it
+          const upcomingItems = nodeBoxes.filter(
+            (n) => n.top > minCutY && n.top <= targetCutY
+          );
+          if (upcomingItems.length > 0) {
+            const lastItem = upcomingItems[upcomingItems.length - 1];
+            bestCutY = Math.max(minCutY, lastItem.top - 4 * scale);
+          } else {
+            bestCutY = targetCutY;
           }
         }
 
-        const sliceHeight = Math.max(100, bestCutY - currentCanvasY);
+        const sliceHeight = Math.max(80, Math.round(bestCutY - currentCanvasY));
         const sliceCanvas = document.createElement('canvas');
         sliceCanvas.width = canvas.width;
         sliceCanvas.height = sliceHeight;
         const ctx = sliceCanvas.getContext('2d');
         if (ctx) {
-          ctx.drawImage(canvas, 0, currentCanvasY, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, sliceHeight);
+          ctx.drawImage(
+            canvas,
+            0, currentCanvasY, canvas.width, sliceHeight,
+            0, 0, canvas.width, sliceHeight
+          );
           const sliceData = sliceCanvas.toDataURL('image/png');
           const sliceHeightMm = (sliceHeight / scale) * mmPerPx;
-          pdf.addImage(sliceData, 'PNG', 0, 0, pdfWidth, sliceHeightMm);
+          pdf.addImage(sliceData, 'PNG', 0, topOffsetMm, pdfWidth, sliceHeightMm);
         }
 
-        currentCanvasY = bestCutY;
+        currentCanvasY = currentCanvasY + sliceHeight;
         pageIndex++;
       }
 

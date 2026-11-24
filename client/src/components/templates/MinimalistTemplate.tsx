@@ -1,5 +1,6 @@
 import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
+import { useResumeStore } from '../../store/useResumeStore';
 import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
 import { DraggableSection } from '../preview/DraggableSection';
 import { getSectionTitle } from '../../utils/sectionTitles';
@@ -10,6 +11,7 @@ interface TemplateProps {
 }
 
 export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) => {
+  const { focusSection } = useResumeStore();
   const { personalInfo, summary, experience, education, skills, projects, certifications, visibleSections } = resumeData;
 
   const fontStyle = { fontFamily: getFontFamilyCss(theme.fontFamily) };
@@ -43,7 +45,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     if (visibleSections.experience === false || !experience || experience.length === 0) return null;
     return (
       <section key="experience" className={`resume-section ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
-        <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-0.5 mb-2 leading-snug`}>
+        <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b-2 border-zinc-200 pb-0.5 mb-2 leading-snug`}>
           {getSectionTitle(resumeData, 'experience', 'Experience')}
         </h2>
         <div className={isSinglePageFit ? 'space-y-2.5' : 'space-y-3.5'}>
@@ -82,7 +84,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     if (visibleSections.skills === false) return null;
     return (
       <section key="skills" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
-        <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-0.5 mb-1.5 leading-snug`}>
+        <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b-2 border-zinc-200 pb-0.5 mb-1.5 leading-snug`}>
           {getSectionTitle(resumeData, 'skills', 'Competencies')}
         </h2>
         <div className="grid grid-cols-2 gap-2 text-zinc-700 font-light text-xs">
@@ -114,7 +116,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     if (visibleSections.projects === false || !projects || projects.length === 0) return null;
     return (
       <section key="projects" className={`resume-section ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
-        <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-0.5 mb-2 leading-snug`}>
+        <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b-2 border-zinc-200 pb-0.5 mb-2 leading-snug`}>
           {getSectionTitle(resumeData, 'projects', 'Selected Work')}
         </h2>
         <div className={isSinglePageFit ? 'space-y-2' : 'space-y-3'}>
@@ -139,7 +141,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     if (visibleSections.education === false || !education || education.length === 0) return null;
     return (
       <section key="education" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
-        <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-0.5 mb-1.5 leading-snug`}>
+        <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b-2 border-zinc-200 pb-0.5 mb-1.5 leading-snug`}>
           {getSectionTitle(resumeData, 'education', 'Education')}
         </h2>
         <div className="space-y-1.5">
@@ -163,7 +165,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     if (visibleSections.certifications === false || !certifications || certifications.length === 0) return null;
     return (
       <section key="certifications" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
-        <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-0.5 mb-1.5 leading-snug`}>
+        <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b-2 border-zinc-200 pb-0.5 mb-1.5 leading-snug`}>
           {getSectionTitle(resumeData, 'certifications', 'Certifications')}
         </h2>
         <div className="space-y-1">
@@ -183,8 +185,8 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
     if (visibleSections[sec.id] === false || !sec.items?.length) return null;
     return (
       <section key={sec.id} className={`resume-section ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
-        <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b border-zinc-200 pb-0.5 mb-1.5 leading-snug`}>
-          {sec.title}
+        <h2 className={`${sizeClasses.h2} font-semibold tracking-widest uppercase text-zinc-400 border-b-2 border-zinc-200 pb-0.5 mb-1.5 leading-snug`}>
+          {getSectionTitle(resumeData, sec.id, sec.title)}
         </h2>
         <div className="space-y-1.5">
           {sec.items.map((it, idx) => (
@@ -230,7 +232,11 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ resumeData, theme 
       className={`w-full max-w-[800px] mx-auto bg-white text-zinc-900 ${isSinglePageFit ? 'py-5 px-6 sm:py-6 sm:px-8' : 'p-8 sm:p-10'} shadow-sm ${sizeClasses.body} print:p-0 print:shadow-none`}
     >
       {/* Clean Minimal Header */}
-      <header className={`flex flex-col sm:flex-row justify-between items-start gap-4 ${isSinglePageFit ? 'mb-4' : 'mb-6'}`}>
+      <header
+        onDoubleClick={() => focusSection('personal')}
+        title="Double-click to edit Personal Information in form"
+        className={`flex flex-col sm:flex-row justify-between items-start gap-4 cursor-pointer hover:ring-1 hover:ring-blue-400/40 rounded transition-all ${isSinglePageFit ? 'mb-4' : 'mb-6'}`}
+      >
         <div>
           <h1 className={`${sizeClasses.h1} font-light tracking-tight text-zinc-950 uppercase`}>
             {personalInfo.fullName}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ResumeSchema, ThemeSettings } from '../../types/resume';
+import { useResumeStore } from '../../store/useResumeStore';
 import { getFontFamilyCss, getFontSizeClasses, getBulletIcon } from '../../utils/fontStyles';
 import { DraggableSection } from '../preview/DraggableSection';
 import { getSectionTitle } from '../../utils/sectionTitles';
@@ -10,6 +11,7 @@ interface TemplateProps {
 }
 
 export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }) => {
+  const { focusSection } = useResumeStore();
   const { personalInfo, summary, experience, education, skills, certifications, visibleSections } = resumeData;
 
   const fontStyle = { fontFamily: getFontFamilyCss(theme.fontFamily) };
@@ -45,7 +47,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
     if (visibleSections.experience === false || !experience || experience.length === 0) return null;
     return (
       <section key="experience" className={`resume-section ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
-        <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-[1.5px] border-slate-400 pb-0.5 mb-2 leading-snug`}>
+        <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-0.5 mb-2 leading-snug`} style={{ borderColor: theme.primaryColor }}>
           {getSectionTitle(resumeData, 'experience', 'Professional Experience & Career History')}
         </h2>
         <div className={isSinglePageFit ? 'space-y-2.5' : 'space-y-4'}>
@@ -83,7 +85,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
     if (visibleSections.skills === false) return null;
     return (
       <section key="skills" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-5'}`}>
-        <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-[1.5px] border-slate-400 pb-0.5 mb-2 leading-snug`}>
+        <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-0.5 mb-2 leading-snug`} style={{ borderColor: theme.primaryColor }}>
           {getSectionTitle(resumeData, 'skills', 'Strategic Competencies & Board Focus')}
         </h2>
         <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
@@ -115,7 +117,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
     if (visibleSections.education === false || !education || education.length === 0) return null;
     return (
       <section key="education" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-4'}`}>
-        <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-[1.5px] border-slate-400 pb-0.5 mb-2 leading-snug`}>
+        <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-0.5 mb-2 leading-snug`} style={{ borderColor: theme.primaryColor }}>
           {getSectionTitle(resumeData, 'education', 'Education & Executive Credentials')}
         </h2>
         <div className="space-y-1.5 text-xs">
@@ -138,7 +140,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
     if (visibleSections.certifications === false || !certifications || certifications.length === 0) return null;
     return (
       <section key="certifications" className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mb-3' : 'mb-4'}`}>
-        <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-[1.5px] border-slate-400 pb-0.5 mb-2 leading-snug`}>
+        <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-0.5 mb-2 leading-snug`} style={{ borderColor: theme.primaryColor }}>
           {getSectionTitle(resumeData, 'certifications', 'Certifications & Governance')}
         </h2>
         <div className="space-y-1 text-xs">
@@ -158,8 +160,8 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
     if (visibleSections[sec.id] === false || !sec.items?.length) return null;
     return (
       <section key={sec.id} className={`resume-section break-inside-avoid print:break-inside-avoid ${isSinglePageFit ? 'mt-2.5 mb-3' : 'mt-3 mb-4'}`}>
-        <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-[1.5px] border-slate-400 pb-0.5 mb-2 leading-snug`}>
-          {sec.title}
+        <h2 className={`${sizeClasses.h2} font-bold uppercase tracking-wider text-slate-900 border-b-2 pb-0.5 mb-2 leading-snug`} style={{ borderColor: theme.primaryColor }}>
+          {getSectionTitle(resumeData, sec.id, sec.title)}
         </h2>
         <div className="space-y-2 text-xs">
           {sec.items.map((it, idx) => (
@@ -203,7 +205,12 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resumeData, theme }
       className={`w-full max-w-[800px] mx-auto bg-white text-slate-900 ${isSinglePageFit ? 'py-5 px-6 sm:py-6 sm:px-8' : 'p-7 sm:p-8'} shadow-sm ${sizeClasses.body} print:p-0 print:shadow-none`}
     >
       {/* Executive Double Border Header */}
-      <header className={`flex flex-col sm:flex-row items-center justify-between border-b-2 border-slate-900 gap-4 ${isSinglePageFit ? 'pb-3 mb-2' : 'pb-4 mb-3'}`}>
+      <header
+        onDoubleClick={() => focusSection('personal')}
+        title="Double-click to edit Personal Information in form"
+        className={`flex flex-col sm:flex-row items-center justify-between border-b-2 gap-4 cursor-pointer hover:ring-1 hover:ring-blue-400/40 rounded transition-all ${isSinglePageFit ? 'pb-3 mb-2' : 'pb-4 mb-3'}`}
+        style={{ borderColor: theme.primaryColor }}
+      >
         {theme.showPhoto && personalInfo.photoUrl && (
           <img
             src={personalInfo.photoUrl}
